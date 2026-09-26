@@ -17,6 +17,11 @@
   --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px rgb(0 0 0 / 0.05);
   --radius: 12px;
   --tap: 44px;
+  /* Capacitor (Android) injects --safe-area-inset-*; browsers use env(). */
+  --sat: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --sar: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --sab: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --sal: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color-scheme: light;
 }
@@ -165,7 +170,7 @@ kbd {
   justify-content: space-around;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--sab);
 }
 .brand {
   display: none;
@@ -187,8 +192,8 @@ kbd {
   font-weight: 600;
 }
 .main {
-  padding: calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom))
-    calc(16px + env(safe-area-inset-left));
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(88px + var(--sab))
+    calc(16px + var(--sal));
 }
 .page {
   max-width: 1080px;
@@ -727,8 +732,8 @@ textarea.input {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: calc(8px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom))
-    calc(16px + env(safe-area-inset-left));
+  padding: calc(8px + var(--sat)) calc(16px + var(--sar)) calc(24px + var(--sab))
+    calc(16px + var(--sal));
 }
 .study-head {
   display: flex;

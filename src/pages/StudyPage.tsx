@@ -9,6 +9,7 @@ import { buildItems, buildReviewQueue, type SessionOptions, type StudyItem } fro
 import { useHotkeys } from '../modes/hooks'
 import { modeById } from '../modes/registry'
 import type { SessionResult } from '../modes/types'
+import { setBackHandler } from '../platform/backButton'
 import { navigate } from '../router'
 import type { Card, CardSet, Direction, Rating, ReviewState } from '../types'
 
@@ -94,10 +95,18 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
 
   async function leave() {
     const inProgress = answered > 0 && !result
-    if (!inProgress || (await confirm('Leave this session? Answers so far are saved.', 'Leave'))) navigate(`/set/${setId}`)
+    if (!inProgress || (await confirm('Leave this session? Answers so far are saved.', 'Leave'))) {
+      navigate(`/set/${setId}`, true)
+    }
   }
 
   useHotkeys({ Escape: () => void leave() })
+
+  // Android back button behaves like Esc; re-registered each render so it sees current state.
+  useEffect(() => {
+    setBackHandler(() => void leave())
+    return () => setBackHandler(null)
+  })
 
   if (!mode || loaded === 'missing') {
     return (

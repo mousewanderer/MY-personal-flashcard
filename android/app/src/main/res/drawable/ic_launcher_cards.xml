@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground: a small stack of cards, drawn inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:pivotX="54" android:pivotY="46" android:rotation="-9">
+        <path android:fillColor="#9CC4E8" android:pathData="M36,34h34a4,4 0,0 1,4 4v22a4,4 0,0 1,-4 4h-34a4,4 0,0 1,-4 -4v-22a4,4 0,0 1,4 -4z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="52" android:rotation="-3">
+        <path android:fillColor="#CFE2F4" android:pathData="M37,40h34a4,4 0,0 1,4 4v22a4,4 0,0 1,-4 4h-34a4,4 0,0 1,-4 -4v-22a4,4 0,0 1,4 -4z" />
+    </group>
+    <path android:fillColor="#FFFFFF" android:pathData="M39,46h34a4,4 0,0 1,4 4v22a4,4 0,0 1,-4 4h-34a4,4 0,0 1,-4 -4v-22a4,4 0,0 1,4 -4z" />
+    <path android:fillColor="#1F5F99" android:pathData="M46,59h20a2,2 0,0 1,0 4h-20a2,2 0,0 1,0 -4z" />
+</vector>

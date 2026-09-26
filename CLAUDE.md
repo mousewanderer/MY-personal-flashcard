@@ -58,6 +58,8 @@ npx cap sync android                  # copy the latest web build into the Andro
 android\gradlew.bat assembleDebug     # local debug APK (JDK + Android command-line tools, no Android Studio)
 ```
 
+Debug APKs are signed with a fixed key (`android/app/debug-signing.p12`, git-ignored). CI rebuilds that file from the `DEBUG_KEYSTORE_BASE64` repo secret, so every update installs over the previous app and keeps its data. Never commit the key: the repo is public.
+
 The main way to get an APK is a GitHub Actions workflow that builds a debug APK on every push to main and uploads it as an artifact. A second workflow deploys the web build to GitHub Pages. The local Gradle build is the fallback.
 
 ## Architecture

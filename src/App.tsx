@@ -1,3 +1,4 @@
+import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core'
 import { useEffect } from 'react'
 import { Icon } from './components/Icon'
 import { APP_NAME } from './config'
@@ -24,6 +25,11 @@ export default function App() {
   useEffect(() => {
     if (theme === 'system') document.documentElement.removeAttribute('data-theme')
     else document.documentElement.dataset.theme = theme
+    if (Capacitor.isNativePlatform()) {
+      // Status bar icons: light on the dark theme, dark on the light theme.
+      const style = theme === 'dark' ? SystemBarsStyle.Dark : theme === 'light' ? SystemBarsStyle.Light : SystemBarsStyle.Default
+      void SystemBars.setStyle({ style })
+    }
   }, [theme])
 
   const [section, a, b] = parts
