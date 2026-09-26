@@ -4,6 +4,8 @@ import { Icon } from './components/Icon'
 import { APP_NAME } from './config'
 import { useSettings } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
+import DocPage from './pages/DocPage'
+import DocsPage from './pages/DocsPage'
 import MySets from './pages/MySets'
 import ProfilePage from './pages/ProfilePage'
 import SetPage from './pages/SetPage'
@@ -53,9 +55,11 @@ export default function App() {
   if (section === 'set' && a) page = <SetPage key={a} id={a} />
   else if (section === 'settings') page = <SettingsPage />
   else if (section === 'profile') page = <ProfilePage />
+  else if (section === 'docs') page = <DocsPage />
+  else if (section === 'doc' && a) page = <DocPage key={a} id={a} />
   else page = <MySets />
 
-  const tab = section === 'settings' || section === 'profile' ? section : 'sets'
+  const tab = section === 'doc' ? 'docs' : ['docs', 'profile', 'settings'].includes(section) ? section : 'sets'
   return (
     <div className="app">
       <nav className="nav" aria-label="Main">
@@ -63,6 +67,10 @@ export default function App() {
         <a className={tab === 'sets' ? 'nav-link is-active' : 'nav-link'} href="#/">
           <Icon name="sets" />
           <span>Sets</span>
+        </a>
+        <a className={tab === 'docs' ? 'nav-link is-active' : 'nav-link'} href="#/docs">
+          <Icon name="doc" />
+          <span>Docs</span>
         </a>
         <a className={tab === 'profile' ? 'nav-link is-active' : 'nav-link'} href="#/profile">
           <Icon name="profile" />

@@ -76,3 +76,15 @@ export interface CardInput {
   back: string
   options?: string[]
 }
+
+/** Plain text extracted from an imported PDF. Device-only: never in CSV, deleted for real. */
+export interface Doc {
+  id: string
+  title: string
+  fileName: string
+  text: string
+  pages: number
+  words: number
+  createdAt: number
+  updatedAt: number
+}

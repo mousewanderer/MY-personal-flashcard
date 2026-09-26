@@ -30,6 +30,8 @@ const PATHS = {
   bolt: 'M13 3L5 14h6l-1 7 8-11h-6l1-7z',
   lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3',
   compass: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM15.5 8.5l-2 5-5 2 2-5z',
+  doc: 'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6',
+  copy: 'M9 9h11v11H9zM5 15H4V4h11v1',
 } as const
 
 export type IconName = keyof typeof PATHS

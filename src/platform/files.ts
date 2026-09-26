@@ -6,7 +6,7 @@ import { Share } from '@capacitor/share'
  * Save a text file. Web: browser download.
  * Android: write it to the cache directory, then open the share sheet (Drive, Files, Messenger...).
  */
-export async function exportTextFile(fileName: string, text: string): Promise<void> {
+export async function exportTextFile(fileName: string, text: string, mime = 'text/csv'): Promise<void> {
   if (Capacitor.isNativePlatform()) {
     const { uri } = await Filesystem.writeFile({
       path: fileName,
@@ -21,7 +21,7 @@ export async function exportTextFile(fileName: string, text: string): Promise<vo
     }
     return
   }
-  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' })
+  const blob = new Blob([text], { type: `${mime};charset=utf-8` })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

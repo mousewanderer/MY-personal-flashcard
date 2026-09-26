@@ -27,6 +27,6 @@ export function initBackButton(): void {
     }
     const path = window.location.hash.replace(/^#/, '').split('?')[0]
     if (path === '' || path === '/') void App.exitApp()
-    else navigate('/', true)
+    else navigate(path.startsWith('/doc/') ? '/docs' : '/', true)
   })
 }

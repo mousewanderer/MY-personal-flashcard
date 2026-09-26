@@ -1,4 +1,5 @@
-import type { Card, CardInput, CardSet, ProfileSettings, Rating, ReviewState, Settings } from '../types'
+import type { Card, CardInput, CardSet, Doc, ProfileSettings, Rating, ReviewState, Settings } from '../types'
+import { wordCount } from '../lib/pdfText'
 import { initialReview, schedule, startOfDay } from '../lib/scheduler'
 import { shouldUpdateSchedule } from '../lib/session'
 import { db } from './db'
@@ -161,6 +162,23 @@ export async function recordAnswer(args: {
     })
     return next
   })
+}
+
+// ---------- docs (device-only, so deletes are real, not tombstones) ----------
+
+export async function addDoc(input: Pick<Doc, 'title' | 'fileName' | 'text' | 'pages'>): Promise<string> {
+  const id = newId()
+  const t = Date.now()
+  await db.docs.add({ ...input, id, words: wordCount(input.text), createdAt: t, updatedAt: t })
+  return id
+}
+
+export async function renameDoc(id: string, title: string): Promise<void> {
+  await db.docs.update(id, { title, updatedAt: Date.now() })
+}
+
+export async function deleteDoc(id: string): Promise<void> {
+  await db.docs.delete(id)
 }
 
 // ---------- first run ----------

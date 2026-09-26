@@ -1578,3 +1578,100 @@ fieldset.field legend {
     transition: none;
   }
 }
+
+/* ---------- docs ---------- */
+
+.doc-status {
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+.doc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: var(--tap);
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.doc-row:hover {
+  border-color: var(--accent);
+}
+.doc-icon {
+  flex: none;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.doc-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.doc-row-text strong {
+  overflow-wrap: anywhere;
+}
+.doc-row > svg {
+  flex: none;
+  color: var(--muted);
+}
+.doc-page .page-head h1 {
+  overflow-wrap: anywhere;
+}
+.doc-page .page-head p {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.doc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.doc-search {
+  flex: 1 1 260px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.doc-search .search {
+  flex: 1 1 200px;
+}
+.doc-count {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.doc-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+  font-size: 1rem;
+  user-select: text;
+}
+.doc-text mark {
+  background: color-mix(in srgb, var(--warn) 30%, transparent);
+  color: inherit;
+  border-radius: 3px;
+}
+.doc-text mark.is-current {
+  background: var(--warn);
+  color: var(--bg);
+}
