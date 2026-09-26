@@ -31,6 +31,7 @@ interface Run {
   id: number
   items: StudyItem[]
   practiceAhead: boolean
+  startedAt: number
 }
 
 export default function StudyPage({ setId, modeId, direction, shuffle, starredOnly }: Props) {
@@ -57,7 +58,7 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
       setNothingDue(scheduled && cards.length === 0 && pool.length > 0)
       setResult(null)
       setAnswered(0)
-      setRun({ id: runId, items: buildItems(cards, options), practiceAhead })
+      setRun({ id: runId, items: buildItems(cards, options), practiceAhead, startedAt: Date.now() })
     },
     [modeId, options],
   )
@@ -126,6 +127,7 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
     body = (
       <SessionSummary
         result={result}
+        since={run.startedAt}
         onRetryMissed={() => void begin(result.missed, run.practiceAhead, run.id + 1)}
         onRestart={() => void begin(loaded.pool, run.practiceAhead, run.id + 1)}
         onExit={() => navigate(`/set/${setId}`)}

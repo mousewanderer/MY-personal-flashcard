@@ -5,6 +5,7 @@ import { APP_NAME } from './config'
 import { useSettings } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
 import MySets from './pages/MySets'
+import ProfilePage from './pages/ProfilePage'
 import SetPage from './pages/SetPage'
 import SettingsPage from './pages/SettingsPage'
 import StudyPage from './pages/StudyPage'
@@ -51,9 +52,10 @@ export default function App() {
   let page
   if (section === 'set' && a) page = <SetPage key={a} id={a} />
   else if (section === 'settings') page = <SettingsPage />
+  else if (section === 'profile') page = <ProfilePage />
   else page = <MySets />
 
-  const tab = section === 'settings' ? 'settings' : 'sets'
+  const tab = section === 'settings' || section === 'profile' ? section : 'sets'
   return (
     <div className="app">
       <nav className="nav" aria-label="Main">
@@ -61,6 +63,10 @@ export default function App() {
         <a className={tab === 'sets' ? 'nav-link is-active' : 'nav-link'} href="#/">
           <Icon name="sets" />
           <span>Sets</span>
+        </a>
+        <a className={tab === 'profile' ? 'nav-link is-active' : 'nav-link'} href="#/profile">
+          <Icon name="profile" />
+          <span>Profile</span>
         </a>
         <a className={tab === 'settings' ? 'nav-link is-active' : 'nav-link'} href="#/settings">
           <Icon name="settings" />

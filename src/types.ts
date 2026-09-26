@@ -62,6 +62,15 @@ export interface Settings {
   ignoreAccents: boolean
 }
 
+export type AvatarColor = 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'teal'
+
+/** The single on-device profile (there are no accounts). */
+export interface ProfileSettings {
+  name: string
+  color: AvatarColor
+  dailyGoal: number
+}
+
 export interface CardInput {
   front: string
   back: string

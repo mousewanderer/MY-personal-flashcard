@@ -23,6 +23,13 @@ const PATHS = {
   wheel: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 7h.01M17 12h.01M12 17h.01M7 12h.01',
   timer: 'M12 5a8 8 0 1 0 0 16a8 8 0 1 0 0-16zM12 9v4l3 2M10 2h4',
   bulk: 'M4 6h16M4 10h16M4 14h10M4 18h7M17 15v6M14 18h6',
+  profile: 'M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM4 20c1.5-4 4.5-6 8-6s6.5 2 8 6',
+  flame: 'M12 3c.5 3.5 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5.2.2 1.9 1 3 2.2 3.4-.7-2.8-.4-5.6.3-8.7z',
+  trophy: 'M8 4h8v6a4 4 0 0 1-8 0V4zM8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 14v4M8 21h8M10 18h4',
+  target: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 12h.01',
+  bolt: 'M13 3L5 14h6l-1 7 8-11h-6l1-7z',
+  lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3',
+  compass: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM15.5 8.5l-2 5-5 2 2-5z',
 } as const
 
 export type IconName = keyof typeof PATHS

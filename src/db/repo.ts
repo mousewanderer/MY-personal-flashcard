@@ -1,4 +1,4 @@
-import type { Card, CardInput, CardSet, Rating, ReviewState, Settings } from '../types'
+import type { Card, CardInput, CardSet, ProfileSettings, Rating, ReviewState, Settings } from '../types'
 import { initialReview, schedule, startOfDay } from '../lib/scheduler'
 import { shouldUpdateSchedule } from '../lib/session'
 import { db } from './db'
@@ -22,6 +22,13 @@ export async function getSettings(): Promise<Settings> {
 
 export async function saveSettings(patch: Partial<Settings>): Promise<void> {
   await db.kv.put({ key: 'settings', value: { ...(await getSettings()), ...patch } })
+}
+
+export const DEFAULT_PROFILE: ProfileSettings = { name: 'Learner', color: 'blue', dailyGoal: 20 }
+
+export async function saveProfile(patch: Partial<ProfileSettings>): Promise<void> {
+  const row = await db.kv.get('profile')
+  await db.kv.put({ key: 'profile', value: { ...DEFAULT_PROFILE, ...(row?.value as object | undefined), ...patch } })
 }
 
 export async function getValue<T>(key: string): Promise<T | undefined> {

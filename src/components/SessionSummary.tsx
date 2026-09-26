@@ -1,17 +1,23 @@
+import { useXp } from '../db/hooks'
 import { formatDuration } from '../lib/format'
+import { levelFromXp } from '../lib/profile'
 import type { SessionResult } from '../modes/types'
+import { Icon } from './Icon'
 
 interface Props {
   result: SessionResult
+  /** When this run started; answers logged since then count as this session's XP. */
+  since: number
   onRetryMissed: () => void
   onRestart: () => void
   onExit: () => void
 }
 
-export function SessionSummary({ result, onRetryMissed, onRestart, onExit }: Props) {
+export function SessionSummary({ result, since, onRetryMissed, onRestart, onExit }: Props) {
   return (
     <div className="mode summary">
       <h2>Session complete</h2>
+      <XpGain since={since} />
       <div className="stat-grid">
         <div className="stat stat-ok">
           <strong>{result.correct}</strong>
@@ -53,6 +59,33 @@ export function SessionSummary({ result, onRetryMissed, onRestart, onExit }: Pro
           Back to set
         </button>
       </div>
+    </div>
+  )
+}
+
+function XpGain({ since }: { since: number }) {
+  const xp = useXp(since)
+  if (!xp || xp.earned === 0) return null
+  const now = levelFromXp(xp.total)
+  const leveledUp = levelFromXp(xp.total - xp.earned).level < now.level
+  return (
+    <div className="panel xp-gain">
+      <div className="row-between">
+        <strong className="xp-earned">
+          <Icon name="bolt" /> +{xp.earned} XP
+        </strong>
+        <span className="small muted">
+          Level {now.level} · {now.into} / {now.needed}
+        </span>
+      </div>
+      <div className="bar xp-bar">
+        <span style={{ width: `${Math.round((now.into / now.needed) * 100)}%` }} />
+      </div>
+      {leveledUp && (
+        <p className="level-up">
+          Level up: you reached level {now.level}, {now.title}.
+        </p>
+      )}
     </div>
   )
 }
