@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Card, CardSet, Doc, ReviewLog, ReviewState } from '../types'
+import type { Card, CardSet, Doc, ReviewLog, ReviewState, Track } from '../types'
 
 export interface KV {
   key: string
@@ -13,6 +13,7 @@ export const db = new Dexie('flashcards') as Dexie & {
   logs: EntityTable<ReviewLog, 'id'>
   kv: EntityTable<KV, 'key'>
   docs: EntityTable<Doc, 'id'>
+  tracks: EntityTable<Track, 'id'>
 }
 
 db.version(1).stores({
@@ -25,4 +26,8 @@ db.version(1).stores({
 
 db.version(2).stores({
   docs: 'id, createdAt',
+})
+
+db.version(3).stores({
+  tracks: 'id, position',
 })

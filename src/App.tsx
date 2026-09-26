@@ -1,9 +1,11 @@
 import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core'
 import { useEffect } from 'react'
 import { Icon } from './components/Icon'
+import { MiniPlayer } from './components/MiniPlayer'
 import { APP_NAME } from './config'
 import { useSettings } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
+import { initMusic } from './music/player'
 import DocPage from './pages/DocPage'
 import DocsPage from './pages/DocsPage'
 import MySets from './pages/MySets'
@@ -22,6 +24,7 @@ export default function App() {
 
   useEffect(() => {
     void ensureFirstRun()
+    void initMusic()
     document.title = APP_NAME
   }, [])
 
@@ -80,6 +83,7 @@ export default function App() {
           <Icon name="settings" />
           <span>Settings</span>
         </a>
+        <MiniPlayer />
       </nav>
       <main className="main">{page}</main>
     </div>

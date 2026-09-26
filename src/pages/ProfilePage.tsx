@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Icon, type IconName } from '../components/Icon'
 import { Modal } from '../components/Modal'
+import { MusicSection } from '../components/MusicSection'
 import { db } from '../db/db'
 import { useProfileSettings } from '../db/hooks'
 import { DEFAULT_PROFILE, saveProfile } from '../db/repo'
@@ -84,6 +85,8 @@ export default function ProfilePage() {
         <StatTile icon="bolt" tone="xp" value={p.xp.toLocaleString()} label="total XP" />
         <StatTile icon="star" tone="mastered" value={p.mastered} label="mastered" />
       </section>
+
+      <MusicSection />
 
       <section className="panel goal-week">
         <div className="goal">

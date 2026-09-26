@@ -1,4 +1,4 @@
-import type { Card, CardInput, CardSet, Doc, ProfileSettings, Rating, ReviewState, Settings } from '../types'
+import type { Card, CardInput, CardSet, Doc, ProfileSettings, Rating, ReviewState, Settings, Track } from '../types'
 import { wordCount } from '../lib/pdfText'
 import { initialReview, schedule, startOfDay } from '../lib/scheduler'
 import { shouldUpdateSchedule } from '../lib/session'
@@ -179,6 +179,27 @@ export async function renameDoc(id: string, title: string): Promise<void> {
 
 export async function deleteDoc(id: string): Promise<void> {
   await db.docs.delete(id)
+}
+
+// ---------- music (device-only, so deletes are real) ----------
+
+export async function addTracks(inputs: Omit<Track, 'id' | 'position' | 'createdAt'>[]): Promise<string[]> {
+  return db.transaction('rw', db.tracks, async () => {
+    const last = await db.tracks.orderBy('position').last()
+    let pos = (last?.position ?? -1) + 1
+    const t = Date.now()
+    const rows = inputs.map((input): Track => ({ ...input, id: newId(), position: pos++, createdAt: t }))
+    await db.tracks.bulkAdd(rows)
+    return rows.map((r) => r.id)
+  })
+}
+
+export async function renameTrack(id: string, title: string): Promise<void> {
+  await db.tracks.update(id, { title })
+}
+
+export async function deleteTrack(id: string): Promise<void> {
+  await db.tracks.delete(id)
 }
 
 // ---------- first run ----------

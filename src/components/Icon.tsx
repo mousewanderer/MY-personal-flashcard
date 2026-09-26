@@ -32,6 +32,15 @@ const PATHS = {
   compass: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM15.5 8.5l-2 5-5 2 2-5z',
   doc: 'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6',
   copy: 'M9 9h11v11H9zM5 15H4V4h11v1',
+  check: 'M5 12l5 5 9-10',
+  play: 'M7 4v16l13-8z',
+  pause: 'M7 4h3v16H7zM14 4h3v16h-3z',
+  prev: 'M19 5v14l-10-7zM6 5v14',
+  next: 'M5 5v14l10-7zM18 5v14',
+  shuffle: 'M4 7h3l10 10h3M4 17h3l10-10h3M17 4l3 3-3 3M17 14l3 3-3 3',
+  repeat: 'M4 11V9a3 3 0 0 1 3-3h12M16 3l3 3-3 3M20 13v2a3 3 0 0 1-3 3H5M8 21l-3-3 3-3',
+  music: 'M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0zM20 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0z',
+  volume: 'M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
 } as const
 
 export type IconName = keyof typeof PATHS

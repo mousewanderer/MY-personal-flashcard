@@ -1675,3 +1675,222 @@ fieldset.field legend {
   background: var(--warn);
   color: var(--bg);
 }
+
+/* ---------- music ---------- */
+
+.music {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.music-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.music-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.music-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.now-playing {
+  --hue: #8457d0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--hue) 16%, var(--surface)), var(--surface-2));
+}
+.np-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: center;
+}
+.np-title strong {
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+.seek {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.seek input,
+.volume input {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--hue);
+}
+.np-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.play-btn {
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--hue);
+  cursor: pointer;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--hue) 40%, transparent);
+}
+.play-btn:active {
+  transform: scale(0.95);
+}
+.icon-btn.is-on {
+  color: var(--hue, var(--accent));
+  background: color-mix(in srgb, var(--hue, var(--accent)) 15%, transparent);
+}
+.repeat-btn {
+  position: relative;
+}
+.repeat-one {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  max-width: 280px;
+  width: 100%;
+  margin: 0 auto;
+}
+.track-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.track {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 4px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.track.is-current {
+  --hue: #8457d0;
+  background: color-mix(in srgb, var(--hue) 14%, var(--surface));
+  box-shadow: inset 3px 0 0 var(--hue);
+}
+.track-main {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.track-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.track.is-current .track-title {
+  font-weight: 600;
+}
+.track-main .small {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-player {
+  --hue: #8457d0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(56px + var(--sab));
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 12px;
+  background: color-mix(in srgb, var(--hue) 12%, var(--surface));
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+.mini-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--hue);
+}
+.mini-title {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.mini-title svg {
+  flex: none;
+  color: var(--hue);
+}
+.mini-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.has-mini .main {
+  padding-bottom: calc(140px + var(--sab));
+}
+@media (min-width: 900px) {
+  .mini-player {
+    position: relative;
+    bottom: auto;
+    margin-top: auto;
+    flex-wrap: wrap;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+    justify-content: center;
+  }
+  .mini-title {
+    flex-basis: 100%;
+  }
+  .has-mini .main {
+    padding-bottom: 32px;
+  }
+}
+.study-music {
+  margin-left: auto;
+}

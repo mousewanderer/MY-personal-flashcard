@@ -88,3 +88,17 @@ export interface Doc {
   createdAt: number
   updatedAt: number
 }
+
+/** An imported song. The audio is kept as a Blob; device-only, never in CSV, deleted for real. */
+export interface Track {
+  id: string
+  title: string
+  fileName: string
+  type: string
+  size: number
+  /** Seconds; 0 when the browser couldn't tell. */
+  duration: number
+  blob: Blob
+  position: number
+  createdAt: number
+}

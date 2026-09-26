@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
+import { RenameForm } from '../components/RenameForm'
 import { useConfirm } from '../components/useConfirm'
 import { db } from '../db/db'
 import { deleteDoc, renameDoc } from '../db/repo'
@@ -174,33 +175,5 @@ export default function DocPage({ id }: { id: string }) {
       </Modal>
       {confirmEl}
     </div>
-  )
-}
-
-function RenameForm(props: { initial: string; onClose: () => void; onSave: (title: string) => Promise<void> }) {
-  const [title, setTitle] = useState(props.initial)
-  return (
-    <form
-      className="stack"
-      onSubmit={async (e) => {
-        e.preventDefault()
-        if (!title.trim()) return
-        await props.onSave(title.trim())
-        props.onClose()
-      }}
-    >
-      <label className="field">
-        <span>Title</span>
-        <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus required />
-      </label>
-      <div className="row-end">
-        <button type="button" className="btn" onClick={props.onClose}>
-          Cancel
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Save
-        </button>
-      </div>
-    </form>
   )
 }

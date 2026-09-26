@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { useConfirm } from '../components/useConfirm'
+import { MusicButton } from '../components/MiniPlayer'
 import { SessionSummary } from '../components/SessionSummary'
 import { db } from '../db/db'
 import { useSettings } from '../db/hooks'
@@ -187,6 +188,7 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
           <strong>{mode.name}</strong>
           <span className="muted">{loaded ? loaded.set.title : ''}</span>
         </div>
+        <MusicButton />
       </header>
       {body}
       {confirmEl}
