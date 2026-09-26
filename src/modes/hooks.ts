@@ -6,6 +6,7 @@ type KeyMap = Record<string, (e: KeyboardEvent) => void | boolean>
  * Window-level shortcuts keyed by `KeyboardEvent.key` (' ', '1', 'Enter', 'Escape', ...).
  * Ignored while typing in a field (except Escape) and while a dialog is open.
  * A handler that returns `false` leaves the key to the browser (e.g. Enter on a focused button).
+ * The `'*'` entry catches any single-character key not listed explicitly.
  */
 export function useHotkeys(map: KeyMap, enabled = true): void {
   const ref = useRef(map)
@@ -19,7 +20,8 @@ export function useHotkeys(map: KeyMap, enabled = true): void {
       if (document.querySelector('dialog[open]')) return
       const target = e.target instanceof Element ? e.target : null
       if (e.key !== 'Escape' && target?.closest('input, textarea, select, [contenteditable="true"]')) return
-      const fn = ref.current[e.key] ?? ref.current[e.key.toLowerCase()]
+      const single = [...e.key].length === 1
+      const fn = ref.current[e.key] ?? ref.current[e.key.toLowerCase()] ?? (single ? ref.current['*'] : undefined)
       if (fn && fn(e) !== false) e.preventDefault()
     }
     window.addEventListener('keydown', onKey)

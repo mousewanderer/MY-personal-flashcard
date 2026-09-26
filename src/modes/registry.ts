@@ -1,8 +1,12 @@
 import type { ComponentType } from 'react'
 import type { IconName } from '../components/Icon'
 import Flashcards from './Flashcards'
+import Hangman from './Hangman'
+import LetterWheel from './LetterWheel'
 import MatchList from './MatchList'
 import MultipleChoice from './MultipleChoice'
+import TimeAttack from './TimeAttack'
+import WordScramble from './WordScramble'
 import Writing from './Writing'
 import type { ModeProps } from './types'
 
@@ -55,6 +59,42 @@ export const MODES: ModeInfo[] = [
     icon: 'matchlist',
     minCards: 2,
     component: MatchList,
+  },
+  {
+    id: 'scramble',
+    name: 'Word Scramble',
+    description: 'Rebuild the answer from its shuffled letters.',
+    group: 'game',
+    icon: 'scramble',
+    minCards: 1,
+    component: WordScramble,
+  },
+  {
+    id: 'hangman',
+    name: 'Hangman',
+    description: 'Uncover the answer one letter at a time before your lives run out.',
+    group: 'game',
+    icon: 'hangman',
+    minCards: 1,
+    component: Hangman,
+  },
+  {
+    id: 'wheel',
+    name: 'Letter Wheel',
+    description: 'Go around the alphabet: each answer starts with the highlighted letter.',
+    group: 'game',
+    icon: 'wheel',
+    minCards: 2,
+    component: LetterWheel,
+  },
+  {
+    id: 'timeattack',
+    name: 'Time Attack',
+    description: 'Match as many pairs as you can in 60 seconds.',
+    group: 'game',
+    icon: 'timer',
+    minCards: 2,
+    component: TimeAttack,
   },
 ]
 

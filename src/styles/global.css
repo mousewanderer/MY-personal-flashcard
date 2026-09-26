@@ -1020,3 +1020,202 @@ textarea.input {
 .missed li + li {
   border-top: 1px solid var(--border);
 }
+
+/* ---------- games ---------- */
+
+.ok-text {
+  color: var(--ok);
+}
+.bad-text {
+  color: var(--bad);
+}
+.timer.is-low {
+  color: var(--bad);
+}
+.timebar span {
+  background: var(--accent);
+  transition: width 0.25s linear;
+}
+
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 18px;
+  padding: 4px 0;
+}
+.slot-word {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+.slot {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 40px;
+  border-bottom: 3px solid var(--border);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.slot.is-filled {
+  border-color: var(--accent);
+}
+.slot.is-missing {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+.slots.is-right .slot {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+.slots.is-revealed .slot {
+  color: var(--bad);
+}
+.slots.is-wrong {
+  animation: shake 0.4s;
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slots.is-wrong {
+    animation: none;
+  }
+  .slots.is-wrong .slot {
+    border-color: var(--bad);
+  }
+}
+
+.letter-tiles,
+.keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+.letter-tile,
+.key {
+  min-width: var(--tap);
+  height: var(--tap);
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-bottom-width: 3px;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.letter-tile:disabled {
+  visibility: hidden;
+}
+.key {
+  min-width: 40px;
+  font-size: 1rem;
+}
+.key:disabled {
+  cursor: default;
+}
+.key.is-hit {
+  background: var(--ok-soft);
+  border-color: var(--ok);
+  color: var(--ok);
+}
+.key.is-miss {
+  opacity: 0.35;
+}
+
+.hangman-board {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.gallows {
+  width: 120px;
+  height: 130px;
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+.wheel {
+  --size: min(80vw, 340px);
+  --b: min(44px, calc(var(--size) * 2.6 / var(--n)));
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 auto;
+}
+.wheel-letter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--b);
+  height: var(--b);
+  margin: calc(var(--b) / -2) 0 0 calc(var(--b) / -2);
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  font-weight: 700;
+  font-size: calc(var(--b) * 0.42);
+  transform: rotate(calc(var(--i) * 360deg / var(--n))) translateY(calc(var(--size) / -2 + var(--b) / 2 + 2px))
+    rotate(calc(var(--i) * -360deg / var(--n)));
+}
+.wheel-letter.is-right {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: var(--surface);
+}
+.wheel-letter.is-wrong {
+  background: var(--bad);
+  border-color: var(--bad);
+  color: var(--surface);
+}
+.wheel-letter.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.wheel-center {
+  position: absolute;
+  inset: 26%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.wheel-center strong {
+  font-size: calc(var(--size) * 0.2);
+  line-height: 1;
+}
+
+.attack-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+@media (min-width: 700px) {
+  .attack-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.attack-grid .tile {
+  min-height: 72px;
+}
+.tile.is-gone {
+  visibility: hidden;
+}
