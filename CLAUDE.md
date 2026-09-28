@@ -15,9 +15,11 @@ The user asked for a basic version with the modes from their flashcards.world sc
 2. Game modes: Word Scramble, Hangman, Letter Wheel and Time Attack. They follow the flashcards.world modes "Word Salad", "Alphabet Ring", "Hangman" and "Time Attack", renamed where the original name was distinctive.
 3. Android: Capacitor, file export and share, the back button, safe areas, and a GitHub Actions debug APK build.
 
+All three phases are done (one commit each). New work comes from the deferred list below, when the user asks for it, and still follows the planning procedure.
+
 Deferred until the user asks: the sync file (Format B) with merge and undo, the PWA and GitHub Pages, text-to-speech and the audio mode, images, drawing, the custom quiz, the stats screen, and the "Brain Gym" tab.
 
-Mode names and descriptions live in one registry (`src/modes/registry.ts`).
+Mode names and descriptions live in one registry (`src/modes/registry.ts`). Each mode is a component that takes `ModeProps` (`src/modes/types.ts`). The mode `id` is stored in the review log, so rename the `name` and never change the `id`.
 
 ## Planning procedure
 
@@ -44,37 +46,41 @@ Build in the phases under "Current scope". Follow these steps for every phase, a
 
 ## Commands
 
-The spec requires these. Check the script names against `package.json` once the project is scaffolded.
-
 ```powershell
 npm run dev                           # Vite dev server
-npm run build                         # production build
+npm run build                         # tsc -b, then vite build (type errors fail the build)
 npm run preview                       # serve the production build locally
 npm run lint                          # oxlint
-npm test                              # all unit tests (vitest run)
+npm test                              # all unit tests (vitest run; only src/**/*.test.ts)
 npx vitest run src/path/x.test.ts     # a single test file
 npx vitest run -t "name"              # tests whose name matches
 npx cap sync android                  # copy the latest web build into the Android project (run after build)
-android\gradlew.bat assembleDebug     # local debug APK (JDK + Android command-line tools, no Android Studio)
+cd android; .\gradlew.bat assembleDebug   # local debug APK (JDK 21 + Android command-line tools, no Android Studio)
+.\scripts\desktop\launch.ps1 -Stop    # stop the desktop shortcut's background server (frees port 5173)
+.\scripts\desktop\launch.ps1 -Install # recreate the "Flashcards" desktop shortcut
 ```
+
+Dev and preview are pinned to port 5173 (`strictPort`) because IndexedDB is per origin: the user's data lives in Edge at `http://localhost:5173`. The desktop shortcut runs `scripts/desktop/launch.ps1`, which rebuilds when the source is newer than `dist/`, serves it with `vite preview` hidden in the background, and opens an Edge `--app` window. If `npm run dev` says the port is in use, stop that server first.
 
 Debug APKs are signed with a fixed key (`android/app/debug-signing.p12`, git-ignored). CI rebuilds that file from the `DEBUG_KEYSTORE_BASE64` repo secret, so every update installs over the previous app and keeps its data. Never commit the key: the repo is public.
 
-The main way to get an APK is a GitHub Actions workflow that builds a debug APK on every push to main and uploads it as an artifact. A second workflow deploys the web build to GitHub Pages. The local Gradle build is the fallback.
+The main way to get an APK is `.github/workflows/android.yml`. On every push to main it runs `npm test`, builds, syncs and uploads `flashcards-debug-apk` as an artifact, so a failing test blocks the APK. It fails on purpose if the secret is missing. There is no Pages workflow yet (deferred). The local Gradle build is the fallback. The README holds the user-facing install and signing steps.
 
 ## Architecture
 
-**Stack:** Vite + React + TypeScript (strict), Dexie over IndexedDB, PapaParse, vite-plugin-pwa, Capacitor (Android), Vitest. Styling is plain CSS or CSS modules. There is no UI framework and no chart library (the 7-day chart is hand-written SVG). Keep dependencies few.
+**Stack:** Vite + React + TypeScript (strict), Dexie over IndexedDB, PapaParse, Capacitor 8 (Android), Vitest. vite-plugin-pwa comes in with the deferred PWA work. Styling is one global stylesheet (`src/styles/global.css`). There is no UI framework and no chart library (the 7-day chart is hand-written SVG). Keep dependencies few.
 
-**One build, two shells.** The same web build runs as a PWA on GitHub Pages (Vite `base` must match the repo path) and inside Capacitor as the Android app. Code that differs by platform goes behind a small service with a web and a native implementation:
-- Text-to-speech: `speak(text, lang)` uses the Web Speech API on web and `@capacitor-community/text-to-speech` on Android, because speechSynthesis in the Android WebView is unreliable. If a language has no voice, it falls back to the default voice and shows a notice once.
-- Export: a browser download on web. On Android it writes the file to the cache directory with `@capacitor/filesystem`, then opens the `@capacitor/share` sheet, with "Save to Documents" as a second option.
+**One build, two shells.** The same web build runs in the browser (and later on GitHub Pages) and inside Capacitor as the Android app. That works because Vite uses `base: './'` and routing uses the URL hash (`src/router.ts`: `useRoute`, `navigate`), so there is no router library and no need for a path-specific base. Code that differs by platform lives in `src/platform/`:
+- Text-to-speech (deferred, not built yet): `speak(text, lang)` uses the Web Speech API on web and `@capacitor-community/text-to-speech` on Android, because speechSynthesis in the Android WebView is unreliable. If a language has no voice, it falls back to the default voice and shows a notice once.
+- Export (`platform/files.ts`): a browser download on web. On Android it writes the file to the cache directory with `@capacitor/filesystem`, then opens the `@capacitor/share` sheet, with "Save to Documents" as a second option.
 - Import: `<input type="file">` on both platforms, accepting MIME types broadly and validating by content.
-- Also platform-specific: the hardware back button (`@capacitor/app`), safe areas and the status bar, and the default device label ("laptop" on web, "phone" on Android).
+- Back button (`platform/backButton.ts`, `@capacitor/app`): a screen registers its handler with `setBackHandler`.
+- Safe areas: Capacitor's SystemBars plugin (`capacitor.config.ts`, `insetsHandling: 'css'`) injects `--safe-area-inset-*`. `global.css` maps these to `--sat`/`--sar`/... and falls back to `env()` in browsers.
+- Device label ("laptop" on web, "phone" on Android): comes with the Format B sync work.
 
-**Data (Dexie).** Tables: sets, cards, review state (one per card), and review log (device-only, feeds stats). IDs are UUIDs. Deletes are soft: set `deleted = true` and bump `updatedAt` so deletions sync as tombstones. Every UI query must filter out deleted rows. Card images are device-only Blobs (resized to max 800 px JPEG) and never go into CSV. Call `navigator.storage.persist()` on first run. The app name lives in one config constant. The Android app id is `com.melyap.flashcards`.
+**Data (Dexie).** The schema is in `src/db/db.ts` (currently version 3). Tables: `sets`, `cards` (indexed by `setId`), `reviews` (one per card, keyed by `cardId`), `logs` (the review log, device-only, feeds stats), `kv` (settings and other small values) and `docs` (added in version 2). `docs` holds the plain text extracted from imported PDFs: the Docs tab, `src/lib/pdf.ts` plus the pure `pdfText.ts`, with pdf.js loaded lazily. Version 3 adds `tracks`, the imported songs stored as Blobs. Docs and tracks are device-only, never go into CSV, and are hard-deleted: they are the exceptions to the soft-delete rule. The music player lives in `src/music/player.ts`: one `<audio>` element outside the React tree, so playback survives route changes and study sessions. It exposes state through `useSyncExternalStore`, with the fast-changing playback time in a separate store so the whole page doesn't re-render several times a second. The queue logic is the pure `src/lib/queue.ts`. All reads and writes go through `src/db/repo.ts`. IDs are UUIDs. Deletes are soft: set `deleted = true` and bump `updatedAt` so deletions sync as tombstones. Every UI query must filter out deleted rows. Card images are device-only Blobs (resized to max 800 px JPEG) and never go into CSV. Call `navigator.storage.persist()` on first run. The Profile tab's XP, level, streaks and achievements are never stored. They are derived from the review log on each render (`src/lib/profile.ts`), so any change to what gets logged changes them too. The only stored part is the name, color and daily goal, in `kv` under `profile`. The app name lives in one config constant. The Android app id is `com.melyap.flashcards`.
 
-**Scheduler.** An SM-2 variant written as pure functions in its own file (spec: "Spaced repetition scheduler"). Pass in the current time and the random source for fuzz so it stays pure and testable. "Mastered" means the card is in review state with an interval of at least 21 days.
+**Scheduler.** An SM-2 variant written as pure functions in `src/lib/scheduler.ts` (spec: "Spaced repetition scheduler"). Pass in the current time and the random source for fuzz so it stays pure and testable. "Mastered" means the card is in review state with an interval of at least 21 days.
 
 **How study modes update the schedule.** This is shared by all modes and is implemented in `shouldUpdateSchedule` (`src/lib/session.ts`) and `recordAnswer` (`src/db/repo.ts`):
 - Flashcards always updates spaced repetition with Again, Hard, Good or Easy. It merges the spec's Review and Flashcards modes. The exception is "Practice all" (studying when nothing is due), which never changes the schedule.
@@ -90,4 +96,4 @@ The main way to get an APK is a GitHub Actions workflow that builds a debug APK 
 - Merge (Format B): match by id and add unknown ids. For content fields, the later `updated_at` wins. For review-state fields, the later `last_reviewed_at` wins, decided separately from content. The local image is always kept.
 - Import is all-or-nothing, in this order: parse → validate the whole file (reject it with the row numbers of any bad rows) → preview the counts (new / updated / deleted / unchanged) → user confirms → snapshot the database (keep the last 3) → apply → offer "Undo last import".
 
-Keep CSV parsing and serialization, merge, the scheduler and the writing-answer checker in pure modules, separate from Dexie and React. Those are the surfaces the spec's Vitest suite covers.
+Keep CSV parsing and serialization, merge, the scheduler and the writing-answer checker in pure modules, separate from Dexie and React. Those are the surfaces the spec's Vitest suite covers. They live in `src/lib/` with a `*.test.ts` file beside each one: `csv`, `scheduler`, `answer` (the writing checker), `session`, `choices`, `bulkPaste` and `games`. Randomness goes through the `Rng` type (`src/lib/random.ts`) so tests can pass a seeded source.

@@ -6,6 +6,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: './',
   plugins: [react()],
+  // IndexedDB is per origin, so a server that drifts to another port would open an empty app.
+  // Dev, preview and the desktop shortcut (scripts/desktop/launch.ps1) all share this one.
+  server: { port: 5173, strictPort: true },
+  preview: { port: 5173, strictPort: true },
   test: {
     include: ['src/**/*.test.ts'],
   },
