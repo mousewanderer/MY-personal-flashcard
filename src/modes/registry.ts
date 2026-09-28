@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import type { IconName } from '../components/Icon'
 import Boss from './Boss'
+import Crossword from './Crossword'
 import Duel from './Duel'
 import Flashcards from './Flashcards'
 import Hangman from './Hangman'
@@ -12,6 +13,7 @@ import Meteor from './Meteor'
 import MultipleChoice from './MultipleChoice'
 import TimeAttack from './TimeAttack'
 import WordScramble from './WordScramble'
+import WordSearch from './WordSearch'
 import Writing from './Writing'
 import type { ModeProps } from './types'
 
@@ -138,6 +140,24 @@ export const MODES: ModeInfo[] = [
     icon: 'memory',
     minCards: 2,
     component: Memory,
+  },
+  {
+    id: 'wordsearch',
+    name: 'Word Search',
+    description: 'Find each answer hidden in a grid of letters. The prompts are your clues.',
+    group: 'game',
+    icon: 'wordsearch',
+    minCards: 3,
+    component: WordSearch,
+  },
+  {
+    id: 'crossword',
+    name: 'Crossword',
+    description: 'A crossword built from your set: prompts are the clues, answers fill the grid.',
+    group: 'game',
+    icon: 'crossword',
+    minCards: 2,
+    component: Crossword,
   },
   {
     id: 'duel',

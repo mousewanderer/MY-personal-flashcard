@@ -26,6 +26,8 @@ const PATHS = {
   boss: 'M4 18h16l1-10-5 4-4-7-4 7-5-4zM6 21h12',
   memory: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
   duel: 'M4 4l10 10M20 4L10 14M6 15l3 3M18 15l-3 3M4 20l3-3M20 20l-3-3',
+  wordsearch: 'M4 4h12v12H4zM4 8h12M4 12h12M8 4v12M12 4v12M15 15l5 5',
+  crossword: 'M3 3h6v6H3zM9 3h6v6H9zM9 9h6v6H9zM15 9h6v6h-6zM9 15h6v6H9z',
   timer: 'M12 5a8 8 0 1 0 0 16a8 8 0 1 0 0-16zM12 9v4l3 2M10 2h4',
   bulk: 'M4 6h16M4 10h16M4 14h10M4 18h7M17 15v6M14 18h6',
   profile: 'M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM4 20c1.5-4 4.5-6 8-6s6.5 2 8 6',
