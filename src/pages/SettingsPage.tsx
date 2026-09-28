@@ -1,9 +1,57 @@
+import { useEffect, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { useSettings, useXp } from '../db/hooks'
-import { saveSettings } from '../db/repo'
+import { getValue, saveSettings, setValue } from '../db/repo'
 import { levelFromXp } from '../lib/profile'
 import { ACCENTS, activeAccent, isUnlocked } from '../lib/unlocks'
+import { canNotify, clearDailyReminder, setDailyReminder } from '../platform/notify'
 import type { Direction, Strictness, Theme } from '../types'
+
+interface Reminder {
+  enabled: boolean
+  time: string
+}
+const REMINDER_KEY = 'reminder'
+const DEFAULT_REMINDER: Reminder = { enabled: false, time: '19:00' }
+
+/** The daily study reminder (Android only): stored in kv and scheduled as a repeating notification. */
+function ReminderSetting() {
+  const [r, setR] = useState<Reminder | null>(null)
+  const [denied, setDenied] = useState(false)
+  useEffect(() => {
+    void getValue<Reminder>(REMINDER_KEY).then((v) => setR({ ...DEFAULT_REMINDER, ...v }))
+  }, [])
+
+  async function update(next: Reminder) {
+    setR(next)
+    setDenied(false)
+    if (next.enabled && !(await setDailyReminder(next.time))) {
+      setDenied(true)
+      next = { ...next, enabled: false }
+      setR(next)
+    } else if (!next.enabled) {
+      await clearDailyReminder()
+    }
+    await setValue(REMINDER_KEY, next)
+  }
+
+  if (!canNotify()) {
+    return <p className="muted small">Daily reminders work in the Android app.</p>
+  }
+  if (!r) return null
+  return (
+    <div className="field">
+      <label className="check">
+        <input type="checkbox" checked={r.enabled} onChange={(e) => void update({ ...r, enabled: e.target.checked })} />
+        Remind me to study every day
+      </label>
+      {r.enabled && (
+        <input className="input" type="time" value={r.time} onChange={(e) => e.target.value && void update({ ...r, time: e.target.value })} />
+      )}
+      {denied && <span className="muted small">Notifications are turned off for this app. Allow them in Android settings, then try again.</span>}
+    </div>
+  )
+}
 
 export default function SettingsPage() {
   const s = useSettings()
@@ -83,6 +131,23 @@ export default function SettingsPage() {
           <input type="checkbox" checked={s.ignoreAccents} onChange={(e) => void saveSettings({ ignoreAccents: e.target.checked })} />
           Ignore accents when checking typed answers
         </label>
+        <label className="field">
+          <span>Scheduler (when cards come back in Flashcards)</span>
+          <select
+            className="input"
+            value={s.scheduler ?? 'classic'}
+            onChange={(e) => void saveSettings({ scheduler: e.target.value as 'classic' | 'fsrs' })}
+          >
+            <option value="classic">Classic: steady, predictable intervals</option>
+            <option value="fsrs">FSRS: learns how well you remember each card</option>
+          </select>
+          <span className="muted small">
+            {s.scheduler === 'fsrs'
+              ? 'FSRS aims for 90% recall and usually needs fewer reviews. You can switch back any time; cards keep their dates.'
+              : 'Switching to FSRS keeps your progress: each card starts from its current interval.'}
+          </span>
+        </label>
+        <ReminderSetting />
       </div>
       <p className="muted small">
         Your cards are stored only on this device, in this browser. Clearing site data deletes them, so export your sets

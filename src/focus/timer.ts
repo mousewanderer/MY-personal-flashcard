@@ -12,6 +12,7 @@ import {
   type FocusState,
 } from '../lib/focus'
 import * as player from '../music/player'
+import { clearFocusAlarm, ensurePermission, onAppActive, setFocusAlarm } from '../platform/notify'
 
 // The focus timer lives outside React (like the music player), so it keeps running across screens.
 
@@ -90,6 +91,8 @@ function setTicking(on: boolean) {
 }
 
 export function start() {
+  // The first start asks for notification permission on Android, for the background alarm.
+  void ensurePermission()
   state = startFocus(state, Date.now())
   setTicking(true)
   syncMusic()
@@ -133,4 +136,13 @@ export async function initFocus() {
   if (saved) settings = { ...DEFAULT_FOCUS, ...saved }
   state = idleFocus(settings)
   publish()
+  // In the background the page cannot beep, so Android shows a notification at the phase end instead.
+  onAppActive((active) => {
+    if (active) {
+      void clearFocusAlarm()
+      tick()
+    } else if (state.running) {
+      void setFocusAlarm(state.endsAt, state.phase)
+    }
+  })
 }

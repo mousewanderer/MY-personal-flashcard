@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react'
 import { textSizeClass } from '../lib/format'
-import { RATINGS, formatInterval, initialReview, previewIntervals } from '../lib/scheduler'
+import { previewWith } from '../lib/fsrs'
+import { RATINGS, formatInterval, initialReview } from '../lib/scheduler'
 import type { Rating } from '../types'
 import { useHotkeys } from './hooks'
 import { resultFrom, type ModeProps } from './types'
 
 const LABELS: Record<Rating, string> = { again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy' }
 
-export default function Flashcards({ items, reviews, practiceAhead, onAnswer, onDone }: ModeProps) {
+export default function Flashcards({ items, reviews, settings, practiceAhead, onAnswer, onDone }: ModeProps) {
   const [queue, setQueue] = useState(items)
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -18,7 +19,7 @@ export default function Flashcards({ items, reviews, practiceAhead, onAnswer, on
   // Intervals are relative, so any fixed reference time gives the same labels.
   const preview =
     item && !practiceAhead
-      ? previewIntervals(reviews.get(item.card.id) ?? initialReview(item.card.id), startedAt)
+      ? previewWith(settings.scheduler, reviews.get(item.card.id) ?? initialReview(item.card.id), startedAt)
       : null
 
   async function rate(rating: Rating) {

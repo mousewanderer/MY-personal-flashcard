@@ -10,6 +10,11 @@ const config: CapacitorConfig = {
       insetsHandling: 'css',
       initialViewportFitValueHint: 'cover',
     },
+    LocalNotifications: {
+      // One-colour icon in android/app/src/main/res/drawable, so it never shows as a white square.
+      smallIcon: 'ic_stat_notify',
+      iconColor: '#1f5f99',
+    },
   },
 }
 

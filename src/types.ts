@@ -43,6 +43,9 @@ export interface ReviewState {
   lapses: number
   learningStep: number
   lastReviewedAt: number | null
+  /** FSRS memory, set once the FSRS scheduler has rated the card (see lib/fsrs). */
+  stability?: number
+  difficulty?: number
 }
 
 export interface ReviewLog {
@@ -66,6 +69,8 @@ export interface Settings {
   ignoreAccents: boolean
   /** Unlockable accent colour id (see lib/unlocks); missing means the default. */
   accent?: string
+  /** Which spaced repetition scheduler rates cards; missing means classic. */
+  scheduler?: 'classic' | 'fsrs'
 }
 
 export type AvatarColor = 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'teal'

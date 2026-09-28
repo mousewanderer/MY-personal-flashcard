@@ -2,7 +2,8 @@ import type { Card, CardInput, CardSet, Doc, ProfileSettings, Rating, ReviewStat
 import { DAILY_MODE } from '../lib/daily'
 import { capForExam } from '../lib/exam'
 import { wordCount } from '../lib/pdfText'
-import { initialReview, schedule, startOfDay } from '../lib/scheduler'
+import { scheduleWith } from '../lib/fsrs'
+import { initialReview, startOfDay } from '../lib/scheduler'
 import { shouldUpdateSchedule } from '../lib/session'
 import { hasTag } from '../lib/tags'
 import { db } from './db'
@@ -161,13 +162,14 @@ export async function recordAnswer(args: {
   const { card, mode, correct, practiceAhead = false } = args
   const rating: Rating = args.rating ?? (correct ? 'good' : 'again')
   const t = Date.now()
+  const { scheduler } = await getSettings()
   return db.transaction('rw', db.reviews, db.logs, db.sets, async () => {
     const prev = (await db.reviews.get(card.id)) ?? initialReview(card.id)
     const scheduled = shouldUpdateSchedule(mode, prev, t, practiceAhead)
     let next: ReviewState | undefined
     if (scheduled) {
       const examDate = (await db.sets.get(card.setId))?.examDate
-      next = capForExam(schedule(prev, rating, t), examDate, t)
+      next = capForExam(scheduleWith(scheduler, prev, rating, t), examDate, t)
       await db.reviews.put(next)
     }
     await db.logs.add({
