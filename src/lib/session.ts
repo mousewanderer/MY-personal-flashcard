@@ -1,4 +1,5 @@
 import type { Card, Direction, ReviewState } from '../types'
+import { parseCloze } from './cloze'
 import { shuffle, type Rng } from './random'
 import { isDue } from './scheduler'
 
@@ -16,7 +17,10 @@ export interface SessionOptions {
   shuffle: boolean
 }
 
+/** A fill-in-the-blank card always asks the sentence with its blanks, whatever the direction. */
 export function makeItem(card: Card, reversed: boolean, key = card.id): StudyItem {
+  const cloze = parseCloze(card.front)
+  if (cloze) return { key, card, reversed: false, prompt: cloze.prompt, answer: cloze.answer }
   return {
     key,
     card,

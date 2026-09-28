@@ -8,12 +8,15 @@ interface Props {
   result: SessionResult
   /** When this run started; answers logged since then count as this session's XP. */
   since: number
-  onRetryMissed: () => void
-  onRestart: () => void
+  /** Left out to hide "Study missed cards again". */
+  onRetryMissed?: () => void
+  /** Left out to hide "Start over". */
+  onRestart?: () => void
   onExit: () => void
+  exitLabel?: string
 }
 
-export function SessionSummary({ result, since, onRetryMissed, onRestart, onExit }: Props) {
+export function SessionSummary({ result, since, onRetryMissed, onRestart, onExit, exitLabel = 'Back to set' }: Props) {
   return (
     <div className="mode summary">
       <h2>Session complete</h2>
@@ -47,16 +50,18 @@ export function SessionSummary({ result, since, onRetryMissed, onRestart, onExit
         </>
       )}
       <div className="row-center wrap">
-        {result.missed.length > 0 && (
+        {result.missed.length > 0 && onRetryMissed && (
           <button type="button" className="btn btn-primary" onClick={onRetryMissed}>
             Study missed cards again
           </button>
         )}
-        <button type="button" className="btn" onClick={onRestart}>
-          Start over
-        </button>
+        {onRestart && (
+          <button type="button" className="btn" onClick={onRestart}>
+            Start over
+          </button>
+        )}
         <button type="button" className="btn" onClick={onExit}>
-          Back to set
+          {exitLabel}
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import Papa from 'papaparse'
 import type { Card, CardInput } from '../types'
+import { clozeBack } from './cloze'
 
 export interface SimpleCsv {
   rows: string[][]
@@ -37,7 +38,8 @@ export function rowsToCards(rows: string[][], firstRowNumber = 1): RowsResult {
   const cards: CardInput[] = []
   const skipped: number[] = []
   rows.forEach((row, i) => {
-    const [front = '', back = '', ...rest] = row
+    const [front = '', given = '', ...rest] = row
+    const back = clozeBack(front, given)
     if (!front || !back) {
       skipped.push(firstRowNumber + i)
       return

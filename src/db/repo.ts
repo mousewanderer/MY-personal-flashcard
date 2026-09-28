@@ -1,7 +1,9 @@
 import type { Card, CardInput, CardSet, Doc, ProfileSettings, Rating, ReviewState, Settings, Track } from '../types'
+import { DAILY_MODE } from '../lib/daily'
 import { wordCount } from '../lib/pdfText'
 import { initialReview, schedule, startOfDay } from '../lib/scheduler'
 import { shouldUpdateSchedule } from '../lib/session'
+import { hasTag } from '../lib/tags'
 import { db } from './db'
 
 export const newId = () => crypto.randomUUID()
@@ -42,17 +44,27 @@ export async function setValue(key: string, value: unknown): Promise<void> {
 
 // ---------- sets ----------
 
-export async function createSet(title: string, description = ''): Promise<string> {
+export async function createSet(title: string, description = '', tags: string[] = []): Promise<string> {
   const t = Date.now()
   const id = newId()
   await db.sets.add({
-    id, title: title.trim() || 'Untitled set', description: description.trim(),
+    id, title: title.trim() || 'Untitled set', description: description.trim(), tags,
     frontLang: 'en-US', backLang: 'en-US', createdAt: t, updatedAt: t, deleted: false,
   })
   return id
 }
 
-export async function updateSet(id: string, patch: Partial<Pick<CardSet, 'title' | 'description'>>): Promise<void> {
+/** Cards (not deleted) of every set that is not deleted, optionally only sets with `tag`. */
+export async function cardsForTag(tag?: string | null): Promise<Card[]> {
+  const sets = (await db.sets.toArray()).filter((s) => !s.deleted && hasTag(s, tag))
+  const ids = new Set(sets.map((s) => s.id))
+  return (await db.cards.toArray()).filter((c) => !c.deleted && ids.has(c.setId))
+}
+
+/** Every daily challenge answer, for the streak and today's progress. */
+export const dailyLogs = () => db.logs.filter((l) => l.mode === DAILY_MODE).toArray()
+
+export async function updateSet(id: string, patch: Partial<Pick<CardSet, 'title' | 'description' | 'tags'>>): Promise<void> {
   await db.sets.update(id, { ...patch, updatedAt: Date.now() })
 }
 

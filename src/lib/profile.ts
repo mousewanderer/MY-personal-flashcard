@@ -1,4 +1,5 @@
 import type { ReviewLog, ReviewState } from '../types'
+import { dailyStatus } from './daily'
 import { isMastered, startOfDay } from './scheduler'
 
 type LogLike = Pick<ReviewLog, 'timestamp' | 'correct' | 'mode'>
@@ -103,7 +104,7 @@ export function bestCorrectRun(logs: Pick<ReviewLog, 'correct'>[]): number {
 
 // ---------- achievements ----------
 
-export type AchievementKind = 'answers' | 'streak' | 'mastered' | 'modes' | 'run' | 'goal'
+export type AchievementKind = 'answers' | 'streak' | 'mastered' | 'modes' | 'run' | 'goal' | 'perfect'
 
 export interface Achievement {
   id: string
@@ -131,6 +132,7 @@ function defs(modeCount: number): Def[] {
     { id: 'modes', name: 'Explorer', description: 'Try every study mode and game', kind: 'modes', target: modeCount },
     { id: 'run-25', name: 'Sharpshooter', description: 'Get 25 answers right in a row', kind: 'run', target: 25 },
     { id: 'goal-7', name: 'Goal Getter', description: 'Meet your daily goal on 7 days', kind: 'goal', target: 7 },
+    { id: 'perfect-day', name: 'Perfect Day', description: 'Get 10 out of 10 in a daily challenge', kind: 'perfect', target: 1 },
   ]
 }
 
@@ -166,6 +168,7 @@ export function buildProfile(
     modes: modeIds.filter((id) => used.has(id)).length,
     run: bestCorrectRun(logs),
     goal: [...days.values()].filter((n) => n >= Math.max(1, dailyGoal)).length,
+    perfect: dailyStatus(logs, now).perfectDays,
   }
   const xp = totalXp(logs)
   return {

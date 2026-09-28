@@ -1,21 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { FocusButton } from '../components/FocusButton'
 import { Icon } from '../components/Icon'
 import { useConfirm } from '../components/useConfirm'
 import { MusicButton } from '../components/MiniPlayer'
 import { SessionSummary } from '../components/SessionSummary'
 import { db } from '../db/db'
 import { useSettings } from '../db/hooks'
-import { getSettings, newCardsIntroducedToday, recordAnswer, reviewsFor, setCards } from '../db/repo'
+import { cardsForTag, getSettings, newCardsIntroducedToday, recordAnswer, reviewsFor, setCards } from '../db/repo'
 import { buildItems, buildReviewQueue, type SessionOptions, type StudyItem } from '../lib/session'
 import { useHotkeys } from '../modes/hooks'
 import { modeById } from '../modes/registry'
 import type { SessionResult } from '../modes/types'
 import { setBackHandler } from '../platform/backButton'
 import { navigate } from '../router'
-import type { Card, CardSet, Direction, Rating, ReviewState } from '../types'
+import type { Card, Direction, Rating, ReviewState } from '../types'
+
+/** The set id that studies every set (optionally one tag) at once. */
+export const ALL_SETS = 'all'
 
 interface Props {
+  /** A set id, or ALL_SETS. */
   setId: string
+  tag?: string
   modeId: string
   direction: Direction
   shuffle: boolean
@@ -23,7 +29,7 @@ interface Props {
 }
 
 interface Loaded {
-  set: CardSet
+  title: string
   cards: Card[]
   pool: Card[]
 }
@@ -35,8 +41,10 @@ interface Run {
   startedAt: number
 }
 
-export default function StudyPage({ setId, modeId, direction, shuffle, starredOnly }: Props) {
+export default function StudyPage({ setId, tag, modeId, direction, shuffle, starredOnly }: Props) {
   const mode = modeById(modeId)
+  const all = setId === ALL_SETS
+  const home = all ? '/' : `/set/${setId}`
   const options = useMemo<SessionOptions>(() => ({ direction, shuffle }), [direction, shuffle])
   const settings = useSettings()
   const [loaded, setLoaded] = useState<Loaded | null | 'missing'>(null)
@@ -67,23 +75,24 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
   useEffect(() => {
     let cancelled = false
     void (async () => {
-      const set = await db.sets.get(setId)
-      if (!set || set.deleted) {
+      const set = all ? null : await db.sets.get(setId)
+      if (!all && (!set || set.deleted)) {
         if (!cancelled) setLoaded('missing')
         return
       }
-      const cards = await setCards(setId)
+      const cards = all ? await cardsForTag(tag) : await setCards(setId)
+      const title = set ? set.title : tag ? `Tag: ${tag}` : 'All sets'
       const pool = starredOnly ? cards.filter((c) => c.starred) : cards
       const r = await reviewsFor(cards.map((c) => c.id))
       if (cancelled) return
       setReviews(r)
-      setLoaded({ set, cards, pool })
+      setLoaded({ title, cards, pool })
       await begin(pool, false, 1)
     })()
     return () => {
       cancelled = true
     }
-  }, [setId, starredOnly, begin])
+  }, [setId, all, tag, starredOnly, begin])
 
   const onAnswer = useCallback(
     async (item: StudyItem, correct: boolean, rating?: Rating) => {
@@ -98,7 +107,7 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
   async function leave() {
     const inProgress = answered > 0 && !result
     if (!inProgress || (await confirm('Leave this session? Answers so far are saved.', 'Leave'))) {
-      navigate(`/set/${setId}`, true)
+      navigate(home, true)
     }
   }
 
@@ -131,7 +140,8 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
         since={run.startedAt}
         onRetryMissed={() => void begin(result.missed, run.practiceAhead, run.id + 1)}
         onRestart={() => void begin(loaded.pool, run.practiceAhead, run.id + 1)}
-        onExit={() => navigate(`/set/${setId}`)}
+        onExit={() => navigate(home)}
+        exitLabel={all ? 'Back to My Sets' : undefined}
       />
     )
   } else if (nothingDue) {
@@ -145,8 +155,8 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
           <button type="button" className="btn btn-primary" onClick={() => void begin(loaded.pool, true, 1)}>
             Practice all cards
           </button>
-          <button type="button" className="btn" onClick={() => navigate(`/set/${setId}`)}>
-            Back to set
+          <button type="button" className="btn" onClick={() => navigate(home)}>
+            {all ? 'Back to My Sets' : 'Back to set'}
           </button>
         </div>
       </div>
@@ -157,8 +167,8 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
         <p>
           {mode.name} needs at least {mode.minCards} cards{starredOnly ? ' (starred only is on)' : ''}.
         </p>
-        <button type="button" className="btn" onClick={() => navigate(`/set/${setId}`)}>
-          Back to set
+        <button type="button" className="btn" onClick={() => navigate(home)}>
+          {all ? 'Back to My Sets' : 'Back to set'}
         </button>
       </div>
     )
@@ -186,8 +196,9 @@ export default function StudyPage({ setId, modeId, direction, shuffle, starredOn
         </button>
         <div className="study-title">
           <strong>{mode.name}</strong>
-          <span className="muted">{loaded ? loaded.set.title : ''}</span>
+          <span className="muted">{loaded ? loaded.title : ''}</span>
         </div>
+        <FocusButton className="study-tools" />
         <MusicButton />
       </header>
       {body}

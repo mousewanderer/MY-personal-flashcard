@@ -1,6 +1,6 @@
 import type { Card } from '../types'
 import { shuffle, type Rng } from './random'
-import type { StudyItem } from './session'
+import { makeItem, type StudyItem } from './session'
 
 const key = (s: string) => s.trim().toLowerCase()
 
@@ -25,6 +25,7 @@ export function buildChoices(correct: string, own: string[], pool: string[], rng
 
 /** Choices for a study item: own wrong options (written for the back) only when not reversed. */
 export function itemChoices(item: StudyItem, allCards: Card[], rng: Rng): string[] {
-  const pool = allCards.filter((c) => c.id !== item.card.id).map((c) => (item.reversed ? c.front : c.back))
+  // Built like the item's own answer, so blank cards offer other blanks as wrong answers.
+  const pool = allCards.filter((c) => c.id !== item.card.id).map((c) => makeItem(c, item.reversed).answer)
   return buildChoices(item.answer, item.reversed ? [] : item.card.options, pool, rng)
 }

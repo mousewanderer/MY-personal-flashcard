@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Card, ReviewState } from '../types'
 import { initialReview } from './scheduler'
-import { buildItems, buildReviewQueue, shouldUpdateSchedule } from './session'
+import { buildItems, buildReviewQueue, makeItem, shouldUpdateSchedule } from './session'
 
 const NOW = new Date(2026, 8, 26, 12).getTime()
 const card = (id: string, i: number): Card => ({
@@ -28,6 +28,13 @@ describe('buildReviewQueue', () => {
     ])
     expect(buildReviewQueue(cards, reviews, NOW, 1).map((c) => c.id)).toEqual(['b', 'a', 'd'])
     expect(buildReviewQueue(cards, reviews, NOW, 0).map((c) => c.id)).toEqual(['b', 'a'])
+  })
+})
+
+describe('makeItem', () => {
+  it('asks a blank card as its sentence in either direction', () => {
+    const c = { ...card('z', 9), front: 'I {{am}} here', back: 'am' }
+    expect(makeItem(c, true)).toMatchObject({ prompt: 'I ___ here', answer: 'am', reversed: false })
   })
 })
 

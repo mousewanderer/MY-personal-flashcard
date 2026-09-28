@@ -10,6 +10,8 @@ export interface CardSet {
   description: string
   frontLang: string
   backLang: string
+  /** Optional labels for filtering; missing on sets made before tags existed. */
+  tags?: string[]
   createdAt: number
   updatedAt: number
   deleted: boolean

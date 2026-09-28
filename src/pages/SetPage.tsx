@@ -57,6 +57,15 @@ export default function SetPage({ id }: { id: string }) {
         <div>
           <h1>{set.title}</h1>
           {set.description && <p className="muted">{set.description}</p>}
+          {!!set.tags?.length && (
+            <div className="tag-row">
+              {set.tags.map((t) => (
+                <span key={t} className="tag">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="row wrap">
           <button type="button" className="btn btn-primary" disabled={!cards.length} onClick={() => setPicker(true)}>
@@ -73,7 +82,7 @@ export default function SetPage({ id }: { id: string }) {
           >
             <Icon name="export" /> Export CSV
           </button>
-          <button type="button" className="icon-btn" aria-label="Rename set" onClick={() => setRenaming(true)}>
+          <button type="button" className="icon-btn" aria-label="Edit set details" onClick={() => setRenaming(true)}>
             <Icon name="edit" />
           </button>
         </div>
@@ -171,12 +180,13 @@ export default function SetPage({ id }: { id: string }) {
       />
       <SetFormDialog
         open={renaming}
-        title="Rename set"
+        title="Edit set"
         submitLabel="Save"
         initialTitle={set.title}
         initialDescription={set.description}
+        initialTags={set.tags}
         onClose={() => setRenaming(false)}
-        onSubmit={(title, description) => updateSet(id, { title, description })}
+        onSubmit={(title, description, tags) => updateSet(id, { title, description, tags })}
       />
       {confirmEl}
     </div>

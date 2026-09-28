@@ -62,6 +62,8 @@ const subscribe = subscriber(listeners)
 const subscribeClock = subscriber(clockListeners)
 
 export const usePlayer = (): PlayerState => useSyncExternalStore(subscribe, () => state)
+/** The current state outside React (the focus timer uses it to start and stop music). */
+export const playerState = (): PlayerState => state
 export const usePlayerTime = (): PlayerTime => useSyncExternalStore(subscribeClock, () => clock)
 
 // ---------- the audio element ----------

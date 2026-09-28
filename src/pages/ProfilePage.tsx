@@ -19,6 +19,7 @@ const KIND_ICON: Record<AchievementKind, IconName> = {
   modes: 'compass',
   run: 'target',
   goal: 'trophy',
+  perfect: 'check',
 }
 
 const initials = (name: string) =>

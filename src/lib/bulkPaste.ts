@@ -1,4 +1,5 @@
 import type { CardInput } from '../types'
+import { clozeBack } from './cloze'
 
 export const SEPARATORS = ['\t', ',', ';', ' - ', ' : '] as const
 export type Separator = (typeof SEPARATORS)[number]
@@ -52,7 +53,8 @@ export function parseBulk(text: string, separator?: Separator): BulkResult {
       const at = line.indexOf(sep)
       parts = at < 0 ? [line] : [line.slice(0, at), line.slice(at + sep.length)]
     }
-    const [front = '', back = '', ...rest] = parts.map((p) => p.trim())
+    const [front = '', given = '', ...rest] = parts.map((p) => p.trim())
+    const back = clozeBack(front, given)
     if (!front || !back) skipped.push(i + 1)
     else cards.push({ front, back, options: rest.slice(0, 3).filter(Boolean) })
   })

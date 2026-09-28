@@ -5,8 +5,10 @@ import { MiniPlayer } from './components/MiniPlayer'
 import { APP_NAME } from './config'
 import { useSettings } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
+import { initFocus } from './focus/timer'
 import { initMusic } from './music/player'
 import DocPage from './pages/DocPage'
+import DailyPage from './pages/DailyPage'
 import DocsPage from './pages/DocsPage'
 import MySets from './pages/MySets'
 import ProfilePage from './pages/ProfilePage'
@@ -25,6 +27,7 @@ export default function App() {
   useEffect(() => {
     void ensureFirstRun()
     void initMusic()
+    void initFocus()
     document.title = APP_NAME
   }, [])
 
@@ -46,6 +49,7 @@ export default function App() {
       <StudyPage
         key={`${a}/${b}/${query.toString()}`}
         setId={a}
+        tag={query.get('tag') ?? undefined}
         modeId={b}
         direction={DIRECTIONS.includes(dir) ? dir : 'front-back'}
         shuffle={query.get('shuffle') !== '0'}
@@ -53,6 +57,8 @@ export default function App() {
       />
     )
   }
+
+  if (section === 'daily') return <DailyPage />
 
   let page
   if (section === 'set' && a) page = <SetPage key={a} id={a} />

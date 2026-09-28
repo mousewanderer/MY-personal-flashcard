@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
+import { FocusButton } from '../components/FocusButton'
 import { Icon } from '../components/Icon'
 import { ImportDialog } from '../components/ImportDialog'
 import { Modal } from '../components/Modal'
@@ -8,11 +9,14 @@ import { SetFormDialog } from '../components/SetFormDialog'
 import { StudyModePicker } from '../components/StudyModePicker'
 import { db } from '../db/db'
 import { useSettings } from '../db/hooks'
-import { createSet, deleteSet, duplicateSet, setCards, updateSet } from '../db/repo'
+import { createSet, dailyLogs, deleteSet, duplicateSet, setCards, updateSet } from '../db/repo'
 import { csvFileName, toSimpleCsv } from '../lib/csv'
+import { DAILY_MIN_CARDS, DAILY_SIZE, dailyStatus } from '../lib/daily'
 import { computeStats, masteredPercent, type SetStats } from '../lib/stats'
+import { allTags, hasTag } from '../lib/tags'
 import { exportTextFile } from '../platform/files'
 import { navigate } from '../router'
+import { ALL_SETS } from './StudyPage'
 import type { Card, CardSet } from '../types'
 
 interface Row {
@@ -43,7 +47,10 @@ export default function MySets() {
       })
   }, [])
 
+  const daily = useLiveQuery(async () => dailyStatus(await dailyLogs(), Date.now()), [])
+
   const [query, setQuery] = useState('')
+  const [tag, setTag] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
   const [menuFor, setMenuFor] = useState<Row | null>(null)
@@ -52,9 +59,20 @@ export default function MySets() {
   const [confirmEl, confirm] = useConfirm()
 
   const q = query.trim().toLowerCase()
-  const visible = (rows ?? []).filter(
+  const tags = allTags((rows ?? []).map((r) => r.set))
+  const tagged = (rows ?? []).filter((r) => hasTag(r.set, tag))
+  const visible = tagged.filter(
     (r) => !q || r.set.title.toLowerCase().includes(q) || r.set.description.toLowerCase().includes(q),
   )
+  const due = tagged.reduce((n, r) => n + r.stats.dueToday, 0)
+  const fresh = tagged.reduce((n, r) => n + r.stats.newCount, 0)
+  const totalCards = (rows ?? []).reduce((n, r) => n + r.stats.total, 0)
+
+  function reviewAll() {
+    const params = new URLSearchParams({ dir: settings.defaultDirection, shuffle: '1', starred: '0' })
+    if (tag) params.set('tag', tag)
+    navigate(`/study/${ALL_SETS}/flashcards?${params}`)
+  }
 
   async function exportSet(set: CardSet) {
     await exportTextFile(csvFileName(set.title), toSimpleCsv(await setCards(set.id)))
@@ -69,6 +87,7 @@ export default function MySets() {
       <div className="page-head">
         <h1>My Sets</h1>
         <div className="row">
+          <FocusButton />
           <button type="button" className="btn" onClick={() => setImporting(true)}>
             <Icon name="import" /> Import CSV
           </button>
@@ -78,10 +97,67 @@ export default function MySets() {
         </div>
       </div>
 
+      {rows && rows.length > 0 && (
+        <div className="today-row">
+          <div className="today-card">
+            <div>
+              <strong>
+                {due} {due === 1 ? 'card' : 'cards'} due
+              </strong>
+              <span className="muted small">
+                {tag ? `in sets tagged ${tag}` : 'across your sets'}
+                {fresh > 0 && ` · ${fresh} new`}
+              </span>
+            </div>
+            <button type="button" className="btn btn-primary" disabled={due + fresh === 0} onClick={reviewAll}>
+              Review all
+            </button>
+          </div>
+          <div className="today-card">
+            <div>
+              <strong>Daily challenge</strong>
+              <span className="muted small">
+                {daily?.doneToday
+                  ? `Done today: ${daily.scoreToday} / ${DAILY_SIZE}`
+                  : `${DAILY_SIZE} questions from all your sets`}
+                {daily && daily.streak > 0 && ` · ${daily.streak} ${daily.streak === 1 ? 'day' : 'days'} in a row`}
+              </span>
+            </div>
+            <button
+              type="button"
+              className={daily?.doneToday ? 'btn' : 'btn btn-primary'}
+              disabled={totalCards < DAILY_MIN_CARDS}
+              onClick={() => navigate('/daily')}
+            >
+              {daily?.doneToday ? 'View' : daily?.answeredToday ? 'Continue' : 'Start'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <label className="search">
         <Icon name="search" />
         <input type="search" placeholder="Search sets" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search sets" />
       </label>
+
+      {tags.length > 0 && (
+        <div className="tag-row" role="group" aria-label="Filter by tag">
+          <button type="button" className={tag ? 'tag tag-btn' : 'tag tag-btn is-active'} aria-pressed={!tag} onClick={() => setTag(null)}>
+            All
+          </button>
+          {tags.map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={tag === t ? 'tag tag-btn is-active' : 'tag tag-btn'}
+              aria-pressed={tag === t}
+              onClick={() => setTag(tag === t ? null : t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
 
       {rows && rows.length === 0 && (
         <div className="empty">
@@ -99,6 +175,15 @@ export default function MySets() {
               <a className="set-tile-main" href={`#/set/${set.id}`}>
                 <h3>{set.title}</h3>
                 {set.description && <p className="muted clamp">{set.description}</p>}
+                {!!set.tags?.length && (
+                  <div className="tag-row">
+                    {set.tags.map((t) => (
+                      <span key={t} className="tag">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="set-meta">
                   <span>
                     {stats.total} {stats.total === 1 ? 'card' : 'cards'}
@@ -129,17 +214,18 @@ export default function MySets() {
         title="New set"
         submitLabel="Create"
         onClose={() => setCreating(false)}
-        onSubmit={async (title, description) => navigate(`/set/${await createSet(title, description)}`)}
+        onSubmit={async (title, description, tags) => navigate(`/set/${await createSet(title, description, tags)}`)}
       />
       <SetFormDialog
         open={!!renaming}
-        title="Rename set"
+        title="Edit set"
         submitLabel="Save"
         initialTitle={renaming?.title}
         initialDescription={renaming?.description}
+        initialTags={renaming?.tags}
         onClose={() => setRenaming(null)}
-        onSubmit={async (title, description) => {
-          if (renaming) await updateSet(renaming.id, { title, description })
+        onSubmit={async (title, description, tags) => {
+          if (renaming) await updateSet(renaming.id, { title, description, tags })
         }}
       />
       <ImportDialog open={importing} sets={(rows ?? []).map((r) => r.set)} onClose={() => setImporting(false)} />
@@ -158,7 +244,7 @@ export default function MySets() {
               <Icon name="edit" /> Edit cards
             </button>
             <button type="button" className="btn btn-block" onClick={() => { setRenaming(menuFor.set); setMenuFor(null) }}>
-              <Icon name="edit" /> Rename
+              <Icon name="edit" /> Edit details
             </button>
             <button type="button" className="btn btn-block" onClick={() => { void duplicateSet(menuFor.set.id); setMenuFor(null) }}>
               <Icon name="sets" /> Duplicate
