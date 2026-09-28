@@ -12,6 +12,7 @@ import { useSettings } from '../db/hooks'
 import { createSet, dailyLogs, deleteSet, duplicateSet, setCards, updateSet } from '../db/repo'
 import { csvFileName, toSimpleCsv } from '../lib/csv'
 import { DAILY_MIN_CARDS, DAILY_SIZE, dailyStatus } from '../lib/daily'
+import { examLabel } from '../lib/exam'
 import { computeStats, masteredPercent, type SetStats } from '../lib/stats'
 import { allTags, hasTag } from '../lib/tags'
 import { exportTextFile } from '../platform/files'
@@ -23,6 +24,8 @@ interface Row {
   set: CardSet
   cards: Card[]
   stats: SetStats
+  /** "Exam in 5 days" and so on, or null. */
+  exam: string | null
 }
 
 export default function MySets() {
@@ -43,7 +46,7 @@ export default function MySets() {
       .sort((a, b) => b.updatedAt - a.updatedAt)
       .map((set): Row => {
         const list = bySet.get(set.id) ?? []
-        return { set, cards: list, stats: computeStats(list, reviewMap, now) }
+        return { set, cards: list, stats: computeStats(list, reviewMap, now), exam: examLabel(set.examDate, now) }
       })
   }, [])
 
@@ -190,6 +193,7 @@ export default function MySets() {
                   </span>
                   {stats.dueToday > 0 && <span className="pill pill-accent">{stats.dueToday} due</span>}
                   {stats.newCount > 0 && <span className="pill">{stats.newCount} new</span>}
+                  {row.exam && <span className="pill pill-exam">{row.exam}</span>}
                 </div>
                 <div className="bar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Mastered">
                   <span style={{ width: `${pct}%` }} />
@@ -214,7 +218,7 @@ export default function MySets() {
         title="New set"
         submitLabel="Create"
         onClose={() => setCreating(false)}
-        onSubmit={async (title, description, tags) => navigate(`/set/${await createSet(title, description, tags)}`)}
+        onSubmit={async (v) => navigate(`/set/${await createSet(v.title, v.description, v.tags, v.examDate)}`)}
       />
       <SetFormDialog
         open={!!renaming}
@@ -223,9 +227,10 @@ export default function MySets() {
         initialTitle={renaming?.title}
         initialDescription={renaming?.description}
         initialTags={renaming?.tags}
+        initialExamDate={renaming?.examDate}
         onClose={() => setRenaming(null)}
-        onSubmit={async (title, description, tags) => {
-          if (renaming) await updateSet(renaming.id, { title, description, tags })
+        onSubmit={async (v) => {
+          if (renaming) await updateSet(renaming.id, v)
         }}
       />
       <ImportDialog open={importing} sets={(rows ?? []).map((r) => r.set)} onClose={() => setImporting(false)} />

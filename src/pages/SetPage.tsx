@@ -10,6 +10,7 @@ import { db } from '../db/db'
 import { useSettings } from '../db/hooks'
 import { addCards, deleteCard, moveCard, reviewsFor, setCards, updateCard, updateSet } from '../db/repo'
 import { csvFileName, toSimpleCsv } from '../lib/csv'
+import { examLabel } from '../lib/exam'
 import { computeStats } from '../lib/stats'
 import { exportTextFile } from '../platform/files'
 
@@ -20,7 +21,8 @@ export default function SetPage({ id }: { id: string }) {
     if (!set || set.deleted) return null
     const cards = await setCards(id)
     const reviews = await reviewsFor(cards.map((c) => c.id))
-    return { set, cards, stats: computeStats(cards, reviews, Date.now()) }
+    const now = Date.now()
+    return { set, cards, stats: computeStats(cards, reviews, now), exam: examLabel(set.examDate, now) }
   }, [id])
 
   const [query, setQuery] = useState('')
@@ -57,9 +59,10 @@ export default function SetPage({ id }: { id: string }) {
         <div>
           <h1>{set.title}</h1>
           {set.description && <p className="muted">{set.description}</p>}
-          {!!set.tags?.length && (
+          {(!!set.tags?.length || data.exam) && (
             <div className="tag-row">
-              {set.tags.map((t) => (
+              {data.exam && <span className="pill pill-exam">{data.exam}</span>}
+              {set.tags?.map((t) => (
                 <span key={t} className="tag">
                   {t}
                 </span>
@@ -185,8 +188,9 @@ export default function SetPage({ id }: { id: string }) {
         initialTitle={set.title}
         initialDescription={set.description}
         initialTags={set.tags}
+        initialExamDate={set.examDate}
         onClose={() => setRenaming(false)}
-        onSubmit={(title, description, tags) => updateSet(id, { title, description, tags })}
+        onSubmit={(v) => updateSet(id, v)}
       />
       {confirmEl}
     </div>

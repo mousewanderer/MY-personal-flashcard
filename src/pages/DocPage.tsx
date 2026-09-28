@@ -1,16 +1,32 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { DocCardDialog } from '../components/DocCardDialog'
 import { Icon } from '../components/Icon'
 import { Modal } from '../components/Modal'
 import { RenameForm } from '../components/RenameForm'
 import { useConfirm } from '../components/useConfirm'
 import { db } from '../db/db'
 import { deleteDoc, renameDoc } from '../db/repo'
+import type { Span } from '../lib/docCards'
 import { txtFileName } from '../lib/pdfText'
 import { exportTextFile } from '../platform/files'
 import { navigate } from '../router'
 
 const MAX_MARKS = 2000
+
+/** The current selection as offsets into the container's text, if it lies inside it. */
+function selectionIn(container: HTMLElement): Span | null {
+  const sel = window.getSelection()
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null
+  const range = sel.getRangeAt(0)
+  if (!container.contains(range.commonAncestorContainer)) return null
+  const before = document.createRange()
+  before.selectNodeContents(container)
+  before.setEnd(range.startContainer, range.startOffset)
+  const start = before.toString().length
+  const end = start + range.toString().length
+  return end > start ? { start, end } : null
+}
 
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -48,6 +64,9 @@ export default function DocPage({ id }: { id: string }) {
   const [renaming, setRenaming] = useState(false)
   const [confirmEl, confirm] = useConfirm()
   const body = useRef<HTMLDivElement>(null)
+  const [selection, setSelection] = useState<Span | null>(null)
+  const [making, setMaking] = useState<Span | null>(null)
+  const [added, setAdded] = useState<string | null>(null)
 
   const text = doc?.text ?? ''
   const matches = useMemo(() => findMatches(text, query.trim()), [text, query])
@@ -55,6 +74,19 @@ export default function DocPage({ id }: { id: string }) {
   useEffect(() => {
     body.current?.querySelector('mark.is-current')?.scrollIntoView({ block: 'center' })
   }, [current, matches])
+
+  // Track the selection in the text; the Make card button shows while there is one.
+  useEffect(() => {
+    const onChange = () => setSelection(body.current ? selectionIn(body.current) : null)
+    document.addEventListener('selectionchange', onChange)
+    return () => document.removeEventListener('selectionchange', onChange)
+  }, [])
+
+  useEffect(() => {
+    if (!added) return
+    const t = setTimeout(() => setAdded(null), 2500)
+    return () => clearTimeout(t)
+  }, [added])
 
   useEffect(() => {
     if (!copied) return
@@ -170,6 +202,33 @@ export default function DocPage({ id }: { id: string }) {
         {content}
       </div>
 
+      {selection && !making && (
+        <button
+          type="button"
+          className="btn btn-primary doc-make-card"
+          // Opens on press, before a tap can clear the selection on phones.
+          onPointerDown={(e) => {
+            e.preventDefault()
+            setMaking(selection)
+          }}
+          onClick={() => setMaking(selection)}
+        >
+          <Icon name="plus" /> Make card
+        </button>
+      )}
+      {added && (
+        <p className="doc-toast" role="status">
+          Card added to {added}
+        </p>
+      )}
+      <DocCardDialog
+        open={!!making}
+        text={text}
+        span={making}
+        docTitle={doc.title}
+        onClose={() => setMaking(null)}
+        onAdded={setAdded}
+      />
       <Modal open={renaming} onClose={() => setRenaming(false)} title="Rename doc">
         <RenameForm initial={doc.title} onClose={() => setRenaming(false)} onSave={(t) => renameDoc(doc.id, t)} />
       </Modal>

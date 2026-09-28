@@ -7,6 +7,7 @@ import { db } from '../db/db'
 import { useProfileSettings } from '../db/hooks'
 import { DEFAULT_PROFILE, saveProfile } from '../db/repo'
 import { buildProfile, type AchievementKind, type DayCount } from '../lib/profile'
+import { nextUnlock } from '../lib/unlocks'
 import { MODES } from '../modes/registry'
 import type { AvatarColor, ProfileSettings } from '../types'
 
@@ -54,6 +55,7 @@ export default function ProfilePage() {
   const met = p.today >= goal
   const unlocked = p.achievements.filter((a) => a.unlocked).length
   const { streak, level } = p
+  const unlock = nextUnlock(level.level)
 
   return (
     <div className="page profile">
@@ -72,6 +74,11 @@ export default function ProfilePage() {
           <p className="small muted">
             {level.into} / {level.needed} XP · {level.needed - level.into} to level {level.level + 1}
           </p>
+          {unlock && (
+            <p className="small muted">
+              Next unlock: the {unlock.name} accent colour at level {unlock.level}
+            </p>
+          )}
         </div>
         <button type="button" className="icon-btn profile-edit" aria-label="Edit profile" onClick={() => setEditing(true)}>
           <Icon name="edit" />

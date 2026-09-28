@@ -12,6 +12,8 @@ export interface CardSet {
   backLang: string
   /** Optional labels for filtering; missing on sets made before tags existed. */
   tags?: string[]
+  /** Optional exam day ('YYYY-MM-DD'): until then, reviews are never scheduled past it. */
+  examDate?: string
   createdAt: number
   updatedAt: number
   deleted: boolean
@@ -62,6 +64,8 @@ export interface Settings {
   defaultDirection: Direction
   strictness: Strictness
   ignoreAccents: boolean
+  /** Unlockable accent colour id (see lib/unlocks); missing means the default. */
+  accent?: string
 }
 
 export type AvatarColor = 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'teal'

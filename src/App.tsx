@@ -3,9 +3,11 @@ import { useEffect } from 'react'
 import { Icon } from './components/Icon'
 import { MiniPlayer } from './components/MiniPlayer'
 import { APP_NAME } from './config'
-import { useSettings } from './db/hooks'
+import { useSettings, useXp } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
 import { initFocus } from './focus/timer'
+import { levelFromXp } from './lib/profile'
+import { activeAccent, DEFAULT_ACCENT } from './lib/unlocks'
 import { initMusic } from './music/player'
 import DocPage from './pages/DocPage'
 import DailyPage from './pages/DailyPage'
@@ -20,8 +22,19 @@ import type { Direction } from './types'
 
 const DIRECTIONS: Direction[] = ['front-back', 'back-front', 'mixed']
 
+/** Applies the chosen accent colour once its level is reached. Its own component, so XP updates re-render only this. */
+function AccentColor({ saved }: { saved: string | undefined }) {
+  const xp = useXp(0)
+  const accent = xp ? activeAccent(saved, levelFromXp(xp.total).level) : DEFAULT_ACCENT
+  useEffect(() => {
+    if (accent === DEFAULT_ACCENT) document.documentElement.removeAttribute('data-accent')
+    else document.documentElement.dataset.accent = accent
+  }, [accent])
+  return null
+}
+
 export default function App() {
-  const { theme } = useSettings()
+  const { theme, accent } = useSettings()
   const { parts, query } = useRoute()
 
   useEffect(() => {
@@ -42,10 +55,11 @@ export default function App() {
   }, [theme])
 
   const [section, a, b] = parts
+  const tab = section === 'doc' ? 'docs' : ['docs', 'profile', 'settings'].includes(section) ? section : 'sets'
+  let screen
   if (section === 'study' && a && b) {
     const dir = query.get('dir') as Direction
-    const starredOnly = query.get('starred') === '1'
-    return (
+    screen = (
       <StudyPage
         key={`${a}/${b}/${query.toString()}`}
         setId={a}
@@ -53,45 +67,50 @@ export default function App() {
         modeId={b}
         direction={DIRECTIONS.includes(dir) ? dir : 'front-back'}
         shuffle={query.get('shuffle') !== '0'}
-        starredOnly={starredOnly}
+        starredOnly={query.get('starred') === '1'}
       />
+    )
+  } else if (section === 'daily') {
+    screen = <DailyPage />
+  } else {
+    let page
+    if (section === 'set' && a) page = <SetPage key={a} id={a} />
+    else if (section === 'settings') page = <SettingsPage />
+    else if (section === 'profile') page = <ProfilePage />
+    else if (section === 'docs') page = <DocsPage />
+    else if (section === 'doc' && a) page = <DocPage key={a} id={a} />
+    else page = <MySets />
+    screen = (
+      <div className="app">
+        <nav className="nav" aria-label="Main">
+          <span className="brand">{APP_NAME}</span>
+          <a className={tab === 'sets' ? 'nav-link is-active' : 'nav-link'} href="#/">
+            <Icon name="sets" />
+            <span>Sets</span>
+          </a>
+          <a className={tab === 'docs' ? 'nav-link is-active' : 'nav-link'} href="#/docs">
+            <Icon name="doc" />
+            <span>Docs</span>
+          </a>
+          <a className={tab === 'profile' ? 'nav-link is-active' : 'nav-link'} href="#/profile">
+            <Icon name="profile" />
+            <span>Profile</span>
+          </a>
+          <a className={tab === 'settings' ? 'nav-link is-active' : 'nav-link'} href="#/settings">
+            <Icon name="settings" />
+            <span>Settings</span>
+          </a>
+          <MiniPlayer />
+        </nav>
+        <main className="main">{page}</main>
+      </div>
     )
   }
 
-  if (section === 'daily') return <DailyPage />
-
-  let page
-  if (section === 'set' && a) page = <SetPage key={a} id={a} />
-  else if (section === 'settings') page = <SettingsPage />
-  else if (section === 'profile') page = <ProfilePage />
-  else if (section === 'docs') page = <DocsPage />
-  else if (section === 'doc' && a) page = <DocPage key={a} id={a} />
-  else page = <MySets />
-
-  const tab = section === 'doc' ? 'docs' : ['docs', 'profile', 'settings'].includes(section) ? section : 'sets'
   return (
-    <div className="app">
-      <nav className="nav" aria-label="Main">
-        <span className="brand">{APP_NAME}</span>
-        <a className={tab === 'sets' ? 'nav-link is-active' : 'nav-link'} href="#/">
-          <Icon name="sets" />
-          <span>Sets</span>
-        </a>
-        <a className={tab === 'docs' ? 'nav-link is-active' : 'nav-link'} href="#/docs">
-          <Icon name="doc" />
-          <span>Docs</span>
-        </a>
-        <a className={tab === 'profile' ? 'nav-link is-active' : 'nav-link'} href="#/profile">
-          <Icon name="profile" />
-          <span>Profile</span>
-        </a>
-        <a className={tab === 'settings' ? 'nav-link is-active' : 'nav-link'} href="#/settings">
-          <Icon name="settings" />
-          <span>Settings</span>
-        </a>
-        <MiniPlayer />
-      </nav>
-      <main className="main">{page}</main>
-    </div>
+    <>
+      <AccentColor saved={accent} />
+      {screen}
+    </>
   )
 }

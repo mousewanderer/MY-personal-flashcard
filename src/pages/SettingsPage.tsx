@@ -1,9 +1,15 @@
-import { useSettings } from '../db/hooks'
+import { Icon } from '../components/Icon'
+import { useSettings, useXp } from '../db/hooks'
 import { saveSettings } from '../db/repo'
+import { levelFromXp } from '../lib/profile'
+import { ACCENTS, activeAccent, isUnlocked } from '../lib/unlocks'
 import type { Direction, Strictness, Theme } from '../types'
 
 export default function SettingsPage() {
   const s = useSettings()
+  const xp = useXp(0)
+  const level = levelFromXp(xp?.total ?? 0).level
+  const accent = activeAccent(s.accent, level)
   return (
     <div className="page narrow">
       <h1>Settings</h1>
@@ -16,6 +22,33 @@ export default function SettingsPage() {
             <option value="dark">Dark</option>
           </select>
         </label>
+        <div className="field">
+          <span>Accent colour</span>
+          <div className="accent-grid" role="radiogroup" aria-label="Accent colour">
+            {ACCENTS.map((a) => {
+              const open = isUnlocked(a, level)
+              const on = accent === a.id
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  disabled={!open}
+                  className={`accent-swatch${on ? ' is-on' : ''}`}
+                  onClick={() => void saveSettings({ accent: a.id })}
+                >
+                  <span className="swatch" style={{ background: a.swatch }}>
+                    {!open ? <Icon name="lock" size={16} /> : on ? <Icon name="check" size={16} /> : null}
+                  </span>
+                  <span>{a.name}</span>
+                  {!open && <span className="muted small">Level {a.level}</span>}
+                </button>
+              )
+            })}
+          </div>
+          <span className="muted small">You are level {level}. More colours unlock as you earn XP.</span>
+        </div>
         <label className="field">
           <span>New cards per day (Flashcards)</span>
           <input

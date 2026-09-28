@@ -1,5 +1,6 @@
 import type { Card, CardInput, CardSet, Doc, ProfileSettings, Rating, ReviewState, Settings, Track } from '../types'
 import { DAILY_MODE } from '../lib/daily'
+import { capForExam } from '../lib/exam'
 import { wordCount } from '../lib/pdfText'
 import { initialReview, schedule, startOfDay } from '../lib/scheduler'
 import { shouldUpdateSchedule } from '../lib/session'
@@ -44,11 +45,11 @@ export async function setValue(key: string, value: unknown): Promise<void> {
 
 // ---------- sets ----------
 
-export async function createSet(title: string, description = '', tags: string[] = []): Promise<string> {
+export async function createSet(title: string, description = '', tags: string[] = [], examDate?: string): Promise<string> {
   const t = Date.now()
   const id = newId()
   await db.sets.add({
-    id, title: title.trim() || 'Untitled set', description: description.trim(), tags,
+    id, title: title.trim() || 'Untitled set', description: description.trim(), tags, examDate,
     frontLang: 'en-US', backLang: 'en-US', createdAt: t, updatedAt: t, deleted: false,
   })
   return id
@@ -64,7 +65,7 @@ export async function cardsForTag(tag?: string | null): Promise<Card[]> {
 /** Every daily challenge answer, for the streak and today's progress. */
 export const dailyLogs = () => db.logs.filter((l) => l.mode === DAILY_MODE).toArray()
 
-export async function updateSet(id: string, patch: Partial<Pick<CardSet, 'title' | 'description' | 'tags'>>): Promise<void> {
+export async function updateSet(id: string, patch: Partial<Pick<CardSet, 'title' | 'description' | 'tags' | 'examDate'>>): Promise<void> {
   await db.sets.update(id, { ...patch, updatedAt: Date.now() })
 }
 
@@ -160,12 +161,13 @@ export async function recordAnswer(args: {
   const { card, mode, correct, practiceAhead = false } = args
   const rating: Rating = args.rating ?? (correct ? 'good' : 'again')
   const t = Date.now()
-  return db.transaction('rw', db.reviews, db.logs, async () => {
+  return db.transaction('rw', db.reviews, db.logs, db.sets, async () => {
     const prev = (await db.reviews.get(card.id)) ?? initialReview(card.id)
     const scheduled = shouldUpdateSchedule(mode, prev, t, practiceAhead)
     let next: ReviewState | undefined
     if (scheduled) {
-      next = schedule(prev, rating, t)
+      const examDate = (await db.sets.get(card.setId))?.examDate
+      next = capForExam(schedule(prev, rating, t), examDate, t)
       await db.reviews.put(next)
     }
     await db.logs.add({
