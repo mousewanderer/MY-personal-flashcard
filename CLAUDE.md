@@ -86,7 +86,7 @@ The main way to get an APK is `.github/workflows/android.yml`. On every push to 
 - Flashcards always updates spaced repetition with Again, Hard, Good or Easy. It merges the spec's Review and Flashcards modes. The exception is "Practice all" (studying when nothing is due), which never changes the schedule.
 - A card is "due" when it isn't new and its `due` falls on or before the end of today (`isDue`).
 - Every other mode updates it only for cards that are currently due (correct = Good, wrong = Again), so practicing ahead doesn't inflate intervals.
-- Every answer in every mode is written to the review log.
+- Every answer in every mode is written to the review log, with two exceptions. Duel (`logged: false` in the registry) logs nothing, because two people are answering, and it is left out of the Explorer badge. Memory logs the pairs it finds but never reschedules (`NEVER_RESCHEDULE` in `session.ts`), because it tests tile positions rather than recall.
 - Every mode supports direction (front→back, back→front, mixed), shuffle and starred-only, and ends with a summary that offers "study missed cards again".
 
 **CSV is the sync.** There is no server, and the two devices never talk to each other directly.
@@ -96,4 +96,4 @@ The main way to get an APK is `.github/workflows/android.yml`. On every push to 
 - Merge (Format B): match by id and add unknown ids. For content fields, the later `updated_at` wins. For review-state fields, the later `last_reviewed_at` wins, decided separately from content. The local image is always kept.
 - Import is all-or-nothing, in this order: parse → validate the whole file (reject it with the row numbers of any bad rows) → preview the counts (new / updated / deleted / unchanged) → user confirms → snapshot the database (keep the last 3) → apply → offer "Undo last import".
 
-Keep CSV parsing and serialization, merge, the scheduler and the writing-answer checker in pure modules, separate from Dexie and React. Those are the surfaces the spec's Vitest suite covers. They live in `src/lib/` with a `*.test.ts` file beside each one: `csv`, `scheduler`, `answer` (the writing checker), `session`, `choices`, `bulkPaste`, `games`, `learn` and `meteor`. Randomness goes through the `Rng` type (`src/lib/random.ts`) so tests can pass a seeded source.
+Keep CSV parsing and serialization, merge, the scheduler and the writing-answer checker in pure modules, separate from Dexie and React. Those are the surfaces the spec's Vitest suite covers. They live in `src/lib/` with a `*.test.ts` file beside each one: `csv`, `scheduler`, `answer` (the writing checker), `session`, `choices`, `bulkPaste`, `games`, `learn`, `meteor`, `boss`, `duel` and `memory`. Randomness goes through the `Rng` type (`src/lib/random.ts`) so tests can pass a seeded source.

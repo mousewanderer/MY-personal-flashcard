@@ -49,6 +49,9 @@ export function buildReviewQueue(
   return [...due, ...fresh]
 }
 
+/** Modes whose answers are logged but never reschedule: they test something other than recall. */
+const NEVER_RESCHEDULE = new Set(['memory'])
+
 /**
  * Flashcards always updates the schedule (except "Practice all").
  * Every other mode only updates cards that are currently due, so practicing ahead
@@ -60,6 +63,7 @@ export function shouldUpdateSchedule(
   now: number,
   practiceAhead: boolean,
 ): boolean {
+  if (NEVER_RESCHEDULE.has(mode)) return false
   if (mode === 'flashcards') return !practiceAhead
   return isDue(review, now)
 }

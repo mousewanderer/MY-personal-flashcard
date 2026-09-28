@@ -44,7 +44,7 @@ export default function ProfilePage() {
   }, [])
 
   const p = useMemo(
-    () => data && buildProfile(data.logs, data.reviews, data.now, goal, MODES.map((m) => m.id)),
+    () => data && buildProfile(data.logs, data.reviews, data.now, goal, MODES.filter((m) => m.logged !== false).map((m) => m.id)),
     [data, goal],
   )
 

@@ -22,8 +22,16 @@ export function PromptCard({ text }: { text: string }) {
   )
 }
 
-/** Four options; a right pick moves on by itself, a wrong one waits for Next. */
-export function ChoiceQuestion({ item, options, onAnswer, onNext }: QuestionProps & { options: string[] }) {
+interface ChoiceProps extends QuestionProps {
+  options: string[]
+  /** Also move on by itself after a wrong pick (no Next button). */
+  autoNext?: boolean
+  /** Time ran out: lock the options and show the answer. The parent records it. */
+  timeUp?: boolean
+}
+
+/** Four options; a right pick moves on by itself, a wrong one waits for Next unless `autoNext`. */
+export function ChoiceQuestion({ item, options, onAnswer, onNext, autoNext = false, timeUp = false }: ChoiceProps) {
   const [picked, setPicked] = useState<number | null>(null)
   const timer = useRef(0)
   useEffect(() => () => window.clearTimeout(timer.current), [])
@@ -35,11 +43,11 @@ export function ChoiceQuestion({ item, options, onAnswer, onNext }: QuestionProp
   }
 
   function pick(n: number) {
-    if (picked !== null || n >= options.length) return
+    if (picked !== null || timeUp || n >= options.length) return
     setPicked(n)
     const ok = n === correctIndex
     onAnswer(ok)
-    if (ok) timer.current = window.setTimeout(onNext, 800)
+    if (ok || autoNext) timer.current = window.setTimeout(onNext, ok ? 800 : 1400)
   }
 
   useHotkeys({
@@ -47,8 +55,8 @@ export function ChoiceQuestion({ item, options, onAnswer, onNext }: QuestionProp
     '2': () => pick(1),
     '3': () => pick(2),
     '4': () => pick(3),
-    Enter: () => (picked !== null ? next() : false),
-    ' ': () => (picked !== null ? next() : false),
+    Enter: () => (picked !== null && !autoNext ? next() : false),
+    ' ': () => (picked !== null && !autoNext ? next() : false),
   })
 
   return (
@@ -56,17 +64,17 @@ export function ChoiceQuestion({ item, options, onAnswer, onNext }: QuestionProp
       <PromptCard text={item.prompt} />
       <div className="choices">
         {options.map((o, n) => {
-          const state =
-            picked === null ? '' : n === correctIndex ? ' is-right' : n === picked ? ' is-wrong' : ' is-dim'
+          const revealed = picked !== null || timeUp
+          const state = !revealed ? '' : n === correctIndex ? ' is-right' : n === picked ? ' is-wrong' : ' is-dim'
           return (
-            <button key={n} type="button" className={`choice${state}`} onClick={() => pick(n)} aria-disabled={picked !== null}>
+            <button key={n} type="button" className={`choice${state}`} onClick={() => pick(n)} aria-disabled={picked !== null || timeUp}>
               <kbd>{n + 1}</kbd>
               <span>{o}</span>
             </button>
           )
         })}
       </div>
-      {picked !== null && picked !== correctIndex && (
+      {picked !== null && picked !== correctIndex && !autoNext && (
         <button type="button" className="btn btn-primary btn-block" onClick={next}>
           Next <kbd>Enter</kbd>
         </button>

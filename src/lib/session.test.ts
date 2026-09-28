@@ -44,4 +44,7 @@ describe('shouldUpdateSchedule', () => {
     expect(shouldUpdateSchedule('choice', notDue, NOW, false)).toBe(false)
     expect(shouldUpdateSchedule('writing', initialReview('a'), NOW, false)).toBe(false)
   })
+  it('memory never updates, even for due cards', () => {
+    expect(shouldUpdateSchedule('memory', dueCard, NOW, false)).toBe(false)
+  })
 })

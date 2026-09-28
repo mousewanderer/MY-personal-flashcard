@@ -1,10 +1,13 @@
 import type { ComponentType } from 'react'
 import type { IconName } from '../components/Icon'
+import Boss from './Boss'
+import Duel from './Duel'
 import Flashcards from './Flashcards'
 import Hangman from './Hangman'
 import Learn from './Learn'
 import LetterWheel from './LetterWheel'
 import MatchList from './MatchList'
+import Memory from './Memory'
 import Meteor from './Meteor'
 import MultipleChoice from './MultipleChoice'
 import TimeAttack from './TimeAttack'
@@ -22,6 +25,8 @@ export interface ModeInfo {
   icon: IconName
   minCards: number
   component: ComponentType<ModeProps>
+  /** false: answers are not written to the review log (and the mode is left out of the Explorer badge). */
+  logged?: false
 }
 
 // Rename modes here; the id is stored in the review log, so keep it stable.
@@ -115,6 +120,34 @@ export const MODES: ModeInfo[] = [
     icon: 'meteor',
     minCards: 1,
     component: Meteor,
+  },
+  {
+    id: 'boss',
+    name: 'Boss Battle',
+    description: 'Answer to hit the boss. Streaks hit harder; misses and slow answers cost a heart.',
+    group: 'game',
+    icon: 'boss',
+    minCards: 2,
+    component: Boss,
+  },
+  {
+    id: 'memory',
+    name: 'Memory',
+    description: 'Flip the tiles two at a time to find each term and its answer.',
+    group: 'game',
+    icon: 'memory',
+    minCards: 2,
+    component: Memory,
+  },
+  {
+    id: 'duel',
+    name: 'Duel',
+    description: 'Two players, one device: first to tap the right answer scores. Not saved to your stats.',
+    group: 'game',
+    icon: 'duel',
+    minCards: 2,
+    component: Duel,
+    logged: false,
   },
 ]
 

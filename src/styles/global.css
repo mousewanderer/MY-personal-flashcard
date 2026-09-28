@@ -2086,3 +2086,294 @@ fieldset.field legend {
     animation: none;
   }
 }
+
+/* ---------- Boss Battle ---------- */
+.boss-mode {
+  gap: 12px;
+}
+.boss-arena {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.boss-hp-bar span {
+  background: var(--bad);
+  transition: width 0.3s ease;
+}
+.boss-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  height: 104px;
+}
+.boss-sprite {
+  height: 96px;
+  overflow: visible;
+}
+.boss-mode .prompt-card {
+  min-height: 96px;
+  padding: 16px;
+}
+@media (min-height: 900px) {
+  .boss-stage {
+    height: 140px;
+  }
+  .boss-sprite {
+    height: 130px;
+  }
+}
+.boss-body {
+  fill: #6a3fa0;
+}
+.boss-horn {
+  fill: #3c2a55;
+}
+.boss-brow {
+  stroke: #2a1c3d;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.boss-eye {
+  fill: #fff;
+}
+.boss-pupil {
+  fill: #1b1f24;
+}
+.boss-mouth {
+  fill: #2a1c3d;
+}
+.boss-sprite.is-hit {
+  animation: boss-hit 0.4s;
+}
+@keyframes boss-hit {
+  20% {
+    transform: translateX(-8px) rotate(-4deg);
+    filter: brightness(1.6);
+  }
+  60% {
+    transform: translateX(6px) rotate(3deg);
+  }
+}
+.boss-sprite.is-attack {
+  animation: boss-attack 0.5s;
+}
+@keyframes boss-attack {
+  40% {
+    transform: scale(1.18) translateY(8px);
+    filter: drop-shadow(0 0 12px var(--bad));
+  }
+}
+.boss-damage {
+  position: absolute;
+  top: 8px;
+  left: 60%;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--bad);
+  pointer-events: none;
+  animation: boss-float 0.9s ease-out forwards;
+}
+.boss-damage small {
+  font-size: 0.9rem;
+  color: var(--warn);
+}
+@keyframes boss-float {
+  to {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+}
+.boss-banner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+}
+.boss-mult {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+/* ---------- Memory ---------- */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.memory-grid.is-wide {
+  grid-template-columns: repeat(4, 1fr);
+}
+.mem-tile {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.mem-tile:not(.is-open) {
+  border-color: transparent;
+  background: var(--accent-soft)
+    repeating-linear-gradient(45deg, transparent 0 10px, rgb(127 127 127 / 0.08) 10px 20px);
+}
+.mem-tile.is-open {
+  animation: mem-flip 0.25s ease-out;
+}
+.mem-tile.is-answer.is-open {
+  border-color: var(--accent);
+}
+.mem-tile.is-matched {
+  background: var(--ok-soft);
+  border-color: var(--ok);
+  animation: none;
+}
+@keyframes mem-flip {
+  from {
+    transform: scaleX(0.1);
+  }
+}
+
+/* ---------- Duel ---------- */
+.duel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.duel-p0 {
+  --pc: var(--accent);
+}
+.duel-p1 {
+  --pc: #d9671b;
+}
+.duel-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 2px solid var(--pc);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.duel-side.is-top {
+  transform: rotate(180deg);
+}
+.duel-score {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--pc);
+  font-weight: 600;
+}
+.duel-score strong {
+  font-size: 1.8rem;
+}
+.duel-prompt {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.duel-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.duel-options .choice {
+  min-height: 52px;
+  touch-action: manipulation;
+  user-select: none;
+}
+.duel-status {
+  margin: 0;
+  min-height: 1.4em;
+  text-align: center;
+  font-weight: 600;
+  color: var(--pc);
+}
+.duel-key {
+  display: none;
+}
+.duel-middle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.duel-middle .bar {
+  flex: 1;
+}
+.duel-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px 16px;
+  text-align: center;
+  background: var(--surface);
+  border: 2px solid var(--pc);
+  border-radius: var(--radius);
+}
+.duel-end h2 {
+  margin: 0;
+  color: var(--pc);
+}
+.duel-final {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+.duel-final .duel-p0,
+.duel-final .duel-p1 {
+  color: var(--pc);
+}
+@media (min-width: 800px) {
+  .duel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 12px;
+  }
+  .duel-middle {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .duel-side {
+    grid-row: 2;
+    min-width: 0;
+  }
+  .duel-side.duel-p0 {
+    grid-column: 1;
+  }
+  .duel-side.is-top {
+    grid-column: 2;
+    transform: none;
+  }
+  .duel-key {
+    display: inline-flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boss-sprite.is-hit,
+  .boss-sprite.is-attack,
+  .mem-tile.is-open {
+    animation: none;
+  }
+  .boss-damage {
+    animation: meteor-fade 0.9s forwards;
+  }
+}
