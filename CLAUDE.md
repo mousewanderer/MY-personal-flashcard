@@ -19,7 +19,7 @@ All three phases are done (one commit each). New work comes from the deferred li
 
 Deferred until the user asks: the sync file (Format B) with merge and undo, the PWA and GitHub Pages, text-to-speech and the audio mode, images, drawing, the custom quiz, the stats screen, and the "Brain Gym" tab.
 
-Mode names and descriptions live in one registry (`src/modes/registry.ts`). Each mode is a component that takes `ModeProps` (`src/modes/types.ts`). The mode `id` is stored in the review log, so rename the `name` and never change the `id`.
+Mode names and descriptions live in one registry (`src/modes/registry.ts`). Each mode is a component that takes `ModeProps` (`src/modes/types.ts`). The mode `id` is stored in the review log, so rename the `name` and never change the `id`. The multiple-choice and typed question screens are shared components in `src/modes/questions.tsx` (used by Multiple Choice, Writing and Learn).
 
 ## Planning procedure
 
@@ -96,4 +96,4 @@ The main way to get an APK is `.github/workflows/android.yml`. On every push to 
 - Merge (Format B): match by id and add unknown ids. For content fields, the later `updated_at` wins. For review-state fields, the later `last_reviewed_at` wins, decided separately from content. The local image is always kept.
 - Import is all-or-nothing, in this order: parse → validate the whole file (reject it with the row numbers of any bad rows) → preview the counts (new / updated / deleted / unchanged) → user confirms → snapshot the database (keep the last 3) → apply → offer "Undo last import".
 
-Keep CSV parsing and serialization, merge, the scheduler and the writing-answer checker in pure modules, separate from Dexie and React. Those are the surfaces the spec's Vitest suite covers. They live in `src/lib/` with a `*.test.ts` file beside each one: `csv`, `scheduler`, `answer` (the writing checker), `session`, `choices`, `bulkPaste` and `games`. Randomness goes through the `Rng` type (`src/lib/random.ts`) so tests can pass a seeded source.
+Keep CSV parsing and serialization, merge, the scheduler and the writing-answer checker in pure modules, separate from Dexie and React. Those are the surfaces the spec's Vitest suite covers. They live in `src/lib/` with a `*.test.ts` file beside each one: `csv`, `scheduler`, `answer` (the writing checker), `session`, `choices`, `bulkPaste`, `games`, `learn` and `meteor`. Randomness goes through the `Rng` type (`src/lib/random.ts`) so tests can pass a seeded source.

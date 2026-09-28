@@ -1894,3 +1894,195 @@ fieldset.field legend {
 .study-music {
   margin-left: auto;
 }
+
+/* ---------- Learn ---------- */
+.learn-bar {
+  display: flex;
+}
+.learn-bar span {
+  transition: width 0.3s ease;
+}
+.learn-bar .is-familiar {
+  background: var(--accent);
+  opacity: 0.45;
+}
+.learn-kind {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.learn-round {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  text-align: center;
+  padding: 32px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.learn-round h2,
+.learn-round p {
+  margin: 0;
+}
+.learn-round .bar {
+  width: 100%;
+  max-width: 360px;
+}
+.learn-count strong {
+  font-size: 1.6rem;
+}
+
+/* ---------- Meteor ---------- */
+.meteor-mode {
+  flex: 1;
+  gap: 12px;
+}
+.meteor-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.lives {
+  display: flex;
+  gap: 5px;
+}
+.lives span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bad);
+}
+.lives span.is-lost {
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.meteor-field {
+  position: relative;
+  flex: 1;
+  min-height: 260px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(to bottom, var(--surface-2), var(--surface));
+}
+.meteor-ground {
+  position: absolute;
+  inset: auto 0 0;
+  height: 5px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+.meteor {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  max-width: min(60%, 320px);
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 30% 30%, #7d6a5a, #3b302a 75%);
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: anywhere;
+  box-shadow: 0 0 0 2px rgb(255 150 60 / 0.35), 0 6px 16px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+}
+.meteor.is-long {
+  font-size: 0.85rem;
+}
+.meteor::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 60%;
+  height: 44px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(to top, rgb(255 140 50 / 0.5), transparent);
+  filter: blur(4px);
+}
+.meteor.is-hit {
+  animation: meteor-burst 0.45s ease-out forwards;
+}
+@keyframes meteor-burst {
+  to {
+    transform: translate(-50%, -100%) scale(1.6);
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+.meteor-banner {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  animation: meteor-fade 1.5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes meteor-fade {
+  to {
+    opacity: 0;
+  }
+}
+.meteor-landed {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  max-width: 90%;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--bad-soft);
+  color: var(--bad);
+  text-align: center;
+}
+.meteor-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: var(--surface);
+}
+.meteor-overlay.is-clear {
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+.meteor-overlay h2,
+.meteor-overlay p {
+  margin: 0;
+  max-width: 420px;
+}
+.meteor-form {
+  display: flex;
+  gap: 8px;
+}
+.meteor-form .input {
+  flex: 1;
+  min-width: 0;
+}
+.meteor-form .input.is-wrong {
+  border-color: var(--bad);
+  animation: shake 0.4s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .meteor.is-hit {
+    animation: meteor-fade 0.3s forwards;
+  }
+  .meteor-form .input.is-wrong {
+    animation: none;
+  }
+}

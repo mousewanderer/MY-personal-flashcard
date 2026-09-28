@@ -2,8 +2,10 @@ import type { ComponentType } from 'react'
 import type { IconName } from '../components/Icon'
 import Flashcards from './Flashcards'
 import Hangman from './Hangman'
+import Learn from './Learn'
 import LetterWheel from './LetterWheel'
 import MatchList from './MatchList'
+import Meteor from './Meteor'
 import MultipleChoice from './MultipleChoice'
 import TimeAttack from './TimeAttack'
 import WordScramble from './WordScramble'
@@ -32,6 +34,15 @@ export const MODES: ModeInfo[] = [
     icon: 'flashcards',
     minCards: 1,
     component: Flashcards,
+  },
+  {
+    id: 'learn',
+    name: 'Learn',
+    description: 'Rounds of 7: pick the answer first, then type it, until every card is learned.',
+    group: 'study',
+    icon: 'learn',
+    minCards: 2,
+    component: Learn,
   },
   {
     id: 'choice',
@@ -95,6 +106,15 @@ export const MODES: ModeInfo[] = [
     icon: 'timer',
     minCards: 2,
     component: TimeAttack,
+  },
+  {
+    id: 'meteor',
+    name: 'Meteor',
+    description: 'Type the answer before the falling terms land. Three lives, faster every level.',
+    group: 'game',
+    icon: 'meteor',
+    minCards: 1,
+    component: Meteor,
   },
 ]
 

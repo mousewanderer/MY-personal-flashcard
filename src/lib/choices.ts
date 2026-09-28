@@ -1,4 +1,6 @@
+import type { Card } from '../types'
 import { shuffle, type Rng } from './random'
+import type { StudyItem } from './session'
 
 const key = (s: string) => s.trim().toLowerCase()
 
@@ -19,4 +21,10 @@ export function buildChoices(correct: string, own: string[], pool: string[], rng
   own.forEach(take)
   shuffle(pool, rng).forEach(take)
   return shuffle([answer, ...wrong], rng)
+}
+
+/** Choices for a study item: own wrong options (written for the back) only when not reversed. */
+export function itemChoices(item: StudyItem, allCards: Card[], rng: Rng): string[] {
+  const pool = allCards.filter((c) => c.id !== item.card.id).map((c) => (item.reversed ? c.front : c.back))
+  return buildChoices(item.answer, item.reversed ? [] : item.card.options, pool, rng)
 }
