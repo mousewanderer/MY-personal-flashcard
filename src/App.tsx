@@ -15,6 +15,7 @@ import DocsPage from './pages/DocsPage'
 import MySets from './pages/MySets'
 import ProfilePage from './pages/ProfilePage'
 import SetPage from './pages/SetPage'
+import JoinPage from './pages/JoinPage'
 import SettingsPage from './pages/SettingsPage'
 import StudyPage from './pages/StudyPage'
 import { useRoute } from './router'
@@ -79,6 +80,7 @@ export default function App() {
     else if (section === 'profile') page = <ProfilePage />
     else if (section === 'docs') page = <DocsPage />
     else if (section === 'doc' && a) page = <DocPage key={a} id={a} />
+    else if (section === 'join') page = <JoinPage />
     else page = <MySets />
     screen = (
       <div className="app">

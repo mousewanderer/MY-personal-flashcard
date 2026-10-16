@@ -2584,6 +2584,113 @@ fieldset.field legend {
   }
 }
 
+/* ---------- Hotspot games ---------- */
+.party-lobby {
+  gap: 12px;
+}
+.party-steps {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+.party-address {
+  margin: 0;
+  text-align: center;
+  font: 800 2rem ui-monospace, Consolas, monospace;
+  letter-spacing: 0.02em;
+  user-select: all;
+}
+.party-games {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.party-players {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.party-players li {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.party-join {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+}
+.party-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 6px;
+}
+.party-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  min-width: 0;
+}
+.party-chip.is-me {
+  border-color: var(--accent);
+}
+.party-chip.is-out {
+  opacity: 0.5;
+}
+.party-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.party-hp {
+  flex: 1;
+  min-width: 40px;
+}
+.party-hp span {
+  background: var(--ok);
+  transition: width 0.3s ease;
+}
+.party-status {
+  margin: 0;
+  min-height: 1.4em;
+  text-align: center;
+  font-weight: 600;
+}
+.choice.is-picked {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+}
+.party-standings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  max-width: 360px;
+}
+.party-standings li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.party-standings li.is-me {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .boss-sprite.is-hit,
   .boss-sprite.is-attack,

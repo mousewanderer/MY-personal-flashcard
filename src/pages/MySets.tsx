@@ -16,6 +16,7 @@ import { examLabel } from '../lib/exam'
 import { computeStats, masteredPercent, type SetStats } from '../lib/stats'
 import { allTags, hasTag } from '../lib/tags'
 import { exportTextFile } from '../platform/files'
+import { lanAvailable } from '../platform/lan'
 import { navigate } from '../router'
 import { ALL_SETS } from './StudyPage'
 import type { Card, CardSet } from '../types'
@@ -91,6 +92,11 @@ export default function MySets() {
         <h1>My Sets</h1>
         <div className="row">
           <FocusButton />
+          {lanAvailable && (
+            <a className="btn" href="#/join">
+              Join game
+            </a>
+          )}
           <button type="button" className="btn" onClick={() => setImporting(true)}>
             <Icon name="import" /> Import CSV
           </button>

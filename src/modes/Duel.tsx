@@ -20,6 +20,8 @@ import { textSizeClass } from '../lib/format'
 import { emptySlots, isFull, isUnscrambled, scrambleChars, scrambleTiles, type Placed } from '../lib/games'
 import { shuffle } from '../lib/random'
 import type { StudyItem } from '../lib/session'
+import { PartyHost } from '../party/PartyHost'
+import { lanAvailable } from '../platform/lan'
 import { navigate } from '../router'
 import { HeroSprite } from './Boss'
 import { useElapsed, useHotkeys } from './hooks'
@@ -34,7 +36,7 @@ const KEYS = [
 ] as const
 
 /** Picks the game: the first screen of Duel. */
-function DuelSetup({ items, onPick }: { items: StudyItem[]; onPick: (g: DuelGame) => void }) {
+function DuelSetup({ items, onPick, onHotspot }: { items: StudyItem[]; onPick: (g: DuelGame) => void; onHotspot: () => void }) {
   const scrambles = useMemo(() => items.filter(duelScrambleable).length, [items])
   return (
     <div className="mode">
@@ -52,6 +54,16 @@ function DuelSetup({ items, onPick }: { items: StudyItem[]; onPick: (g: DuelGame
           )
         })}
       </div>
+      <h3 className="center">Several phones</h3>
+      {lanAvailable ? (
+        <div className="row-center">
+          <button type="button" className="btn" onClick={onHotspot}>
+            Host a hotspot game (2 to 4 phones)
+          </button>
+        </div>
+      ) : (
+        <p className="muted small center">Hotspot games for 2 to 4 phones work in the Android app.</p>
+      )}
     </div>
   )
 }
@@ -275,7 +287,8 @@ function LocalDuel({ setId, items, allCards, game, onChangeGame }: ModeProps & {
 }
 
 export default function Duel(props: ModeProps) {
-  const [game, setGame] = useState<DuelGame | null>(null)
-  if (!game) return <DuelSetup items={props.items} onPick={setGame} />
+  const [game, setGame] = useState<DuelGame | 'hotspot' | null>(null)
+  if (game === 'hotspot') return <PartyHost items={props.items} allCards={props.allCards} onExit={() => setGame(null)} />
+  if (!game) return <DuelSetup items={props.items} onPick={setGame} onHotspot={() => setGame('hotspot')} />
   return <LocalDuel key={game} {...props} game={game} onChangeGame={() => setGame(null)} />
 }
