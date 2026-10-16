@@ -14,7 +14,7 @@ export interface Accent {
 export const DEFAULT_ACCENT = 'ocean'
 
 export const ACCENTS: Accent[] = [
-  { id: 'ocean', name: 'Ocean', level: 1, swatch: '#1f5f99' },
+  { id: 'ocean', name: 'Ocean', level: 1, swatch: '#1f6fd1' },
   { id: 'forest', name: 'Forest', level: 3, swatch: '#2e7d4f' },
   { id: 'sunset', name: 'Sunset', level: 5, swatch: '#b04a15' },
   { id: 'grape', name: 'Grape', level: 8, swatch: '#7446c4' },

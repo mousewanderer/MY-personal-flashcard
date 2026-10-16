@@ -69,6 +69,13 @@ export default function App() {
     setFeedbackPrefs({ sound: settings.sound ?? true, volume: settings.volume ?? 0.6, haptics: settings.haptics ?? true })
   }, [settings.sound, settings.volume, settings.haptics])
 
+  // Text size and keyboard hints (hidden by default on the phone, which has no keyboard).
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.text = settings.textSize ?? 'normal'
+    root.dataset.kbd = (settings.kbdHints ?? !Capacitor.isNativePlatform()) ? 'on' : 'off'
+  }, [settings.textSize, settings.kbdHints])
+
   // Reduced motion: the setting, or else the system's choice.
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
