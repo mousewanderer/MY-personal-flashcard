@@ -78,6 +78,8 @@ The main way to get an APK is `.github/workflows/android.yml`. On every push to 
 - **Tags and exam dates:** sets have optional `tags` and `examDate` ('YYYY-MM-DD'), not indexed, so no schema bump. Until an exam, `recordAnswer` caps new review intervals at half the days left (`capForExam`, `src/lib/exam.ts`), whichever scheduler is on.
 - **Cards from Docs:** selecting text on a doc page opens `DocCardDialog`; `src/lib/docCards.ts` finds the sentence and builds a fill-in-the-blank front.
 - **Unlockable accents:** `Settings.accent` picks a colour from `src/lib/unlocks.ts`; it is applied as `data-accent` on `<html>` only once its Profile level is reached (`AccentColor` in `App.tsx`).
+- **Word Scramble board:** `ScrambleBoard` (shared by Word Scramble and the Boss) stores one tile index per slot (`Placed`, `null` = empty), so a placed letter can be tapped back out.
+- **Boss Battle:** the enemy list in `src/lib/boss.ts` (`ENEMIES`) sets the question type, hearts, health, timer and combos per level. Missed cards come back 3 cards later (`nextQueue`). Best times are in `kv` under `best:boss:<setId>:<level>`.
 - **Word Search and Crossword:** `src/lib/wordgrid.ts` turns answers into grid words (`gridWord`) and builds both puzzles; words that do not fit roll into the next puzzle.
 - **Study all sets:** `StudyPage` with the set id `all` (`ALL_SETS`) and an optional `?tag=` studies every set, or one tag.
 - **Daily challenge:** `#/daily` logs with mode `daily`. Today's picks (a date-seeded order), done, score and streak are all derived from the log (`src/lib/daily.ts`); nothing is stored.

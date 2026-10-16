@@ -126,7 +126,7 @@ export const MODES: ModeInfo[] = [
   {
     id: 'boss',
     name: 'Boss Battle',
-    description: 'Answer to hit the boss. Streaks hit harder; misses and slow answers cost a heart.',
+    description: 'Pick an easy, medium or hard enemy and battle it. Right answers attack; mistakes let it hit back.',
     group: 'study',
     icon: 'boss',
     minCards: 2,

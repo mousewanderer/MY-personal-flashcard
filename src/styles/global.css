@@ -2112,13 +2112,30 @@ fieldset.field legend {
   background: var(--bad);
   transition: width 0.3s ease;
 }
-.boss-stage {
+/* Hero on the left, enemy on the right, each over a strip of ground. */
+.battle-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 12px;
+  padding-bottom: 6px;
+  background: linear-gradient(to top, color-mix(in srgb, var(--accent) 14%, transparent) 0 14px, transparent 14px);
+  border-radius: 8px;
+}
+.fighter {
   position: relative;
   display: flex;
-  justify-content: center;
-  height: 104px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
-.boss-sprite {
+.fighter-hp {
+  align-self: stretch;
+}
+.boss-sprite,
+.hero-sprite {
   height: 96px;
   overflow: visible;
 }
@@ -2127,32 +2144,124 @@ fieldset.field legend {
   padding: 16px;
 }
 @media (min-height: 900px) {
-  .boss-stage {
-    height: 140px;
-  }
-  .boss-sprite {
+  .boss-sprite,
+  .hero-sprite {
     height: 130px;
   }
 }
-.boss-body {
+.e-eye {
+  fill: #fff;
+}
+.e-pupil {
+  fill: #1b1f24;
+}
+.e-line {
+  fill: none;
+  stroke: rgb(0 0 0 / 0.45);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.enemy-easy .e-body {
+  fill: #2f7fb8;
+}
+.enemy-medium .e-body {
+  fill: #8a8378;
+}
+.enemy-medium .e-dark {
+  fill: #5e5850;
+}
+.enemy-medium .e-glow {
+  fill: #ffb43c;
+}
+.enemy-hard .e-body {
   fill: #6a3fa0;
 }
-.boss-horn {
-  fill: #3c2a55;
+.enemy-hard .e-dark {
+  fill: #2a1c3d;
 }
-.boss-brow {
-  stroke: #2a1c3d;
+.h-body {
+  fill: #3a7d5c;
+}
+.h-head {
+  fill: #f1c9a5;
+}
+.h-helm {
+  fill: #9aa3ad;
+}
+.h-shield {
+  fill: #c0392b;
+}
+.h-blade {
+  fill: #cfd6dd;
+}
+.h-line {
+  stroke: #7a5a2e;
   stroke-width: 5;
   stroke-linecap: round;
 }
-.boss-eye {
-  fill: #fff;
+/* The hero lunges at the enemy on a hit and flinches on a mistake. */
+.hero-sprite.is-hit {
+  animation: hero-strike 0.4s;
 }
-.boss-pupil {
-  fill: #1b1f24;
+@keyframes hero-strike {
+  40% {
+    transform: translateX(28px);
+  }
 }
-.boss-mouth {
-  fill: #2a1c3d;
+.hero-sprite.is-attack {
+  animation: hero-hurt 0.5s 0.15s;
+}
+@keyframes hero-hurt {
+  30% {
+    transform: translateX(-8px);
+    filter: drop-shadow(0 0 10px var(--bad)) brightness(1.4);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+}
+.enemy-pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.enemy-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 12px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.enemy-card:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.enemy-card:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.enemy-card .boss-sprite {
+  height: 72px;
+}
+.enemy-level {
+  padding: 1px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+.enemy-level.is-easy {
+  background: var(--ok);
+}
+.enemy-level.is-medium {
+  background: var(--warn);
+}
+.enemy-level.is-hard {
+  background: var(--bad);
 }
 .boss-sprite.is-hit {
   animation: boss-hit 0.4s;
@@ -2171,7 +2280,7 @@ fieldset.field legend {
 }
 @keyframes boss-attack {
   40% {
-    transform: scale(1.18) translateY(8px);
+    transform: translateX(-32px) scale(1.12);
     filter: drop-shadow(0 0 12px var(--bad));
   }
 }
@@ -2184,6 +2293,9 @@ fieldset.field legend {
   color: var(--bad);
   pointer-events: none;
   animation: boss-float 0.9s ease-out forwards;
+}
+.boss-damage.is-hero {
+  left: 55%;
 }
 .boss-damage small {
   font-size: 0.9rem;
@@ -2378,6 +2490,8 @@ fieldset.field legend {
 @media (prefers-reduced-motion: reduce) {
   .boss-sprite.is-hit,
   .boss-sprite.is-attack,
+  .hero-sprite.is-hit,
+  .hero-sprite.is-attack,
   .mem-tile.is-open {
     animation: none;
   }
