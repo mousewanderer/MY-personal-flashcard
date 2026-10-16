@@ -21,7 +21,7 @@ if ($Install) {
   $lnk.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
   $lnk.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`""
   $lnk.WorkingDirectory = $root
-  $lnk.IconLocation = "$PSScriptRoot\flashcards.ico,0"
+  $lnk.IconLocation = "$PSScriptRoot\knowetility.ico,0"
   $lnk.WindowStyle = 7
   $lnk.Save()
   return
