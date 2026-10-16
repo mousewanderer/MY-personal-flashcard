@@ -8,7 +8,7 @@ import { useSettings, useXp } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
 import { initFocus } from './focus/timer'
 import { levelFromXp } from './lib/profile'
-import { activeAccent, DEFAULT_ACCENT } from './lib/unlocks'
+import { activeAccent, activeBackdrop, DEFAULT_ACCENT } from './lib/unlocks'
 import { initMusic } from './music/player'
 import DocPage from './pages/DocPage'
 import DailyPage from './pages/DailyPage'
@@ -26,13 +26,19 @@ import type { Direction } from './types'
 const DIRECTIONS: Direction[] = ['front-back', 'back-front', 'mixed']
 
 /** Applies the chosen accent colour once its level is reached. Its own component, so XP updates re-render only this. */
-function AccentColor({ saved }: { saved: string | undefined }) {
+/** Applies the unlocked accent colour and premium theme. A premium theme brings its own accent. */
+function Looks({ accent: savedAccent, backdrop: savedBackdrop }: { accent: string | undefined; backdrop: string | undefined }) {
   const xp = useXp(0)
-  const accent = xp ? activeAccent(saved, levelFromXp(xp.total).level) : DEFAULT_ACCENT
+  const level = xp ? levelFromXp(xp.total).level : 1
+  const backdrop = xp ? activeBackdrop(savedBackdrop, level) : null
+  const accent = xp && !backdrop ? activeAccent(savedAccent, level) : DEFAULT_ACCENT
   useEffect(() => {
-    if (accent === DEFAULT_ACCENT) document.documentElement.removeAttribute('data-accent')
-    else document.documentElement.dataset.accent = accent
-  }, [accent])
+    const root = document.documentElement
+    if (accent === DEFAULT_ACCENT) root.removeAttribute('data-accent')
+    else root.dataset.accent = accent
+    if (backdrop) root.dataset.backdrop = backdrop
+    else root.removeAttribute('data-backdrop')
+  }, [accent, backdrop])
   return null
 }
 
@@ -135,7 +141,7 @@ export default function App() {
 
   return (
     <>
-      <AccentColor saved={accent} />
+      <Looks accent={accent} backdrop={settings.backdrop} />
       {screen}
       <Celebrations />
     </>

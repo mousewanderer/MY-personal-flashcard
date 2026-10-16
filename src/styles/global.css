@@ -3370,3 +3370,147 @@ fieldset.field legend {
   height: 1px;
   opacity: 0;
 }
+
+/* ---------- Premium themes (unlocked by rank; see lib/unlocks) ---------- */
+:root[data-backdrop] {
+  --ok: #34d399;
+  --ok-soft: #0f3326;
+  --bad: #f0877d;
+  --bad-soft: #3c1c1a;
+  --warn: #e2b25a;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+}
+:root[data-backdrop='bronze'] {
+  --bg: #120c08;
+  --surface: #1d140e;
+  --surface-2: #2a1d14;
+  --border: #3d2a1c;
+  --text: #f3e6da;
+  --muted: #b59a84;
+  --accent: #d08a4f;
+  --accent-hover: #e09c62;
+  --accent-text: #1a0f07;
+  --accent-soft: #3a2414;
+  --accent-2: #f0c08a;
+  --glow-1: rgb(208 138 79 / 0.2);
+  --glow-2: rgb(240 192 138 / 0.1);
+}
+:root[data-backdrop='silver'] {
+  --bg: #0e1014;
+  --surface: #171a20;
+  --surface-2: #20242c;
+  --border: #2e333d;
+  --text: #eef1f5;
+  --muted: #a3abb8;
+  --accent: #c9d1dc;
+  --accent-hover: #dde3ea;
+  --accent-text: #12151a;
+  --accent-soft: #262b33;
+  --accent-2: #8fa3bf;
+  --glow-1: rgb(201 209 220 / 0.14);
+  --glow-2: rgb(143 163 191 / 0.12);
+}
+:root[data-backdrop='gold'] {
+  --bg: #0d0b06;
+  --surface: #17130a;
+  --surface-2: #221c0f;
+  --border: #3a2f15;
+  --text: #f7efd9;
+  --muted: #bba97c;
+  --accent: #e3b341;
+  --accent-hover: #f0c75e;
+  --accent-text: #1a1405;
+  --accent-soft: #3a2d0c;
+  --accent-2: #f6d77a;
+  --glow-1: rgb(227 179 65 / 0.2);
+  --glow-2: rgb(246 215 122 / 0.09);
+}
+:root[data-backdrop='king'] {
+  --bg: #12081f;
+  --surface: #1c0f2e;
+  --surface-2: #27163f;
+  --border: #3b2560;
+  --text: #f2eaff;
+  --muted: #b7a3d6;
+  --accent: #a855f7;
+  --accent-hover: #bb79f9;
+  --accent-text: #170826;
+  --accent-soft: #34195a;
+  --accent-2: #f5c542;
+  --glow-1: rgb(168 85 247 / 0.28);
+  --glow-2: rgb(245 197 66 / 0.13);
+}
+/* A slow glow drifts behind the page; the body goes clear so it shows between the panels. */
+:root[data-backdrop] body {
+  background: transparent;
+}
+:root[data-backdrop] body::before {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 32% at 20% 25%, var(--glow-1), transparent 70%),
+    radial-gradient(34% 30% at 80% 72%, var(--glow-2), transparent 70%);
+  animation: glow-drift 24s ease-in-out infinite alternate;
+}
+@keyframes glow-drift {
+  to {
+    transform: translate(6%, -4%) scale(1.08);
+  }
+}
+/* Metals: a sheen sweeps across primary buttons every few seconds. */
+:root[data-backdrop]:not([data-backdrop='king']) .btn-primary {
+  background-image: linear-gradient(110deg, transparent 38%, rgb(255 255 255 / 0.38) 50%, transparent 62%), var(--grad);
+  background-size:
+    250% 100%,
+    100% 100%;
+  background-repeat: no-repeat;
+  animation: metal-sheen 5s ease-in-out infinite;
+}
+@keyframes metal-sheen {
+  0%,
+  65% {
+    background-position:
+      160% 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      -60% 0,
+      0 0;
+  }
+}
+/* Purple King: an aurora with a third colour, and a few twinkling sparkles. */
+:root[data-backdrop='king'] body::before {
+  background:
+    radial-gradient(40% 34% at 18% 22%, var(--glow-1), transparent 70%),
+    radial-gradient(36% 30% at 82% 70%, var(--glow-2), transparent 70%),
+    radial-gradient(30% 26% at 60% 15%, rgb(236 72 153 / 0.12), transparent 70%);
+  animation-duration: 18s;
+}
+:root[data-backdrop='king'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #f5c542, transparent),
+    radial-gradient(1.5px 1.5px at 78% 12%, #fff, transparent),
+    radial-gradient(2px 2px at 64% 64%, #f5c542, transparent),
+    radial-gradient(1.5px 1.5px at 30% 82%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 90% 44%, #d8b4fe, transparent),
+    radial-gradient(2px 2px at 46% 36%, #fff, transparent);
+  animation: twinkle 3.5s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.9;
+  }
+}

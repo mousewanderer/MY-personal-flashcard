@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ACCENTS, activeAccent, isUnlocked, nextUnlock } from './unlocks'
+import { ACCENTS, activeAccent, activeBackdrop, isUnlocked, nextUnlock, UNLOCKABLES } from './unlocks'
 
 describe('unlocks', () => {
   it('opens colours by level', () => {
@@ -17,5 +17,13 @@ describe('unlocks', () => {
     expect(nextUnlock(1)?.id).toBe('forest')
     expect(nextUnlock(5)?.id).toBe('grape')
     expect(nextUnlock(16)).toBeNull()
+  })
+  it('opens premium themes by rank and ignores a locked or unknown one', () => {
+    expect(activeBackdrop('king', 26)).toBe('king')
+    expect(activeBackdrop('king', 25)).toBeNull()
+    expect(activeBackdrop('bronze', 6)).toBe('bronze')
+    expect(activeBackdrop('nope', 99)).toBeNull()
+    expect(activeBackdrop(undefined, 99)).toBeNull()
+    expect(UNLOCKABLES.filter((u) => u.what === 'theme').map((u) => u.level)).toEqual([6, 11, 16, 26])
   })
 })
