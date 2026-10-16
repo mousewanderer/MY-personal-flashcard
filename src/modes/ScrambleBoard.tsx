@@ -10,11 +10,13 @@ interface Props {
   target: string[]
   status: BoardStatus
   shake?: boolean
+  /** false: ignore the keyboard (two boards share one screen in Duel). */
+  keys?: boolean
   onChange: (next: Placed) => void
 }
 
 /** Answer slots and letter tiles. Tap a tile to place it, tap a placed letter to send it back; typing and Backspace work too. */
-export function ScrambleBoard({ answer, tiles, placed, target, status, shake = false, onChange }: Props) {
+export function ScrambleBoard({ answer, tiles, placed, target, status, shake = false, keys = true, onChange }: Props) {
   const playing = status === 'playing'
   useHotkeys({
     Backspace: () => (playing ? onChange(undoSlot(placed)) : false),
@@ -24,7 +26,7 @@ export function ScrambleBoard({ answer, tiles, placed, target, status, shake = f
       if (i < 0) return false
       onChange(placeTile(placed, i))
     },
-  })
+  }, keys)
 
   const text = (slot: number) => {
     if (status === 'revealed') return target[slot]

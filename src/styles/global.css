@@ -2428,6 +2428,103 @@ fieldset.field legend {
 .duel-key {
   display: none;
 }
+/* Fit the whole duel on screen: each half is a size container and its text and buttons scale with it. */
+.study:has(> .duel) {
+  height: 100dvh;
+  padding-bottom: calc(8px + var(--sab));
+}
+.duel,
+.duel-side,
+.duel-prompt {
+  min-height: 0;
+}
+.duel-side {
+  gap: 6px;
+  padding: 8px 10px;
+  overflow: hidden;
+  container-type: size;
+}
+.duel-score {
+  align-items: center;
+}
+.duel-score strong {
+  font-size: clamp(1.1rem, 9cqmin, 1.8rem);
+}
+.duel-prompt {
+  overflow: hidden;
+}
+.duel-prompt .txt-l {
+  font-size: clamp(1rem, 9cqmin, 1.7rem);
+}
+.duel-prompt .txt-m {
+  font-size: clamp(0.85rem, 6cqmin, 1.25rem);
+}
+.duel-prompt .txt-s {
+  font-size: clamp(0.75rem, 4.5cqmin, 1rem);
+}
+.duel-options {
+  gap: clamp(4px, 2cqh, 8px);
+}
+.duel-options .choice {
+  min-height: clamp(34px, 14cqh, 56px);
+  padding: clamp(3px, 1.5cqh, 10px) 10px;
+  gap: 8px;
+  font-size: clamp(0.8rem, 4.6cqmin, 1.05rem);
+  line-height: 1.2;
+}
+.duel-status {
+  font-size: clamp(0.75rem, 4cqmin, 1rem);
+  min-height: 1.2em;
+}
+.duel-scramble {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 2.5cqh, 12px);
+}
+.duel-scramble .slots {
+  gap: 6px 10px;
+  padding: 0;
+}
+.duel-scramble .slot {
+  width: clamp(20px, 9cqmin, 32px);
+  height: clamp(26px, 11cqmin, 40px);
+  font-size: clamp(0.95rem, 6.5cqmin, 1.3rem);
+}
+.duel-scramble .letter-tiles {
+  gap: clamp(4px, 1.5cqmin, 8px);
+}
+.duel-scramble .letter-tile {
+  min-width: clamp(34px, 13cqmin, 48px);
+  height: clamp(34px, 13cqmin, 48px);
+  padding: 0 4px;
+  font-size: clamp(1rem, 6.5cqmin, 1.2rem);
+}
+.duel-hp {
+  flex: 1;
+  min-width: 60px;
+}
+.duel-hp span {
+  background: var(--pc);
+  transition: width 0.3s ease;
+}
+.duel-hero {
+  position: relative;
+  display: inline-flex;
+}
+.duel-hero .hero-sprite {
+  height: 44px;
+}
+.duel-hero.duel-p1 .hero-sprite {
+  scale: -1 1;
+}
+.duel-hero .h-body {
+  fill: var(--pc);
+}
+.duel-hero .boss-damage {
+  top: -8px;
+  left: 20%;
+  font-size: 1.1rem;
+}
 .duel-middle {
   display: flex;
   align-items: center;

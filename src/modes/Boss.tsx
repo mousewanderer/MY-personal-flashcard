@@ -57,7 +57,7 @@ function EnemySprite({ level, kind }: { level: BossLevel; kind?: Fx['kind'] }) {
   )
 }
 
-function HeroSprite({ kind }: { kind: Fx['kind'] }) {
+export function HeroSprite({ kind }: { kind: Fx['kind'] }) {
   return (
     <svg className={`hero-sprite${kind ? ` is-${kind}` : ''}`} viewBox="0 0 100 100" aria-hidden="true">
       <path d="M78 14 L84 18 L58 66 L52 62 Z" className="h-blade" />
