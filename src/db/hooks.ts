@@ -24,3 +24,12 @@ export function useXp(since: number): { total: number; earned: number } | undefi
     return { total: totalXp(all), earned: totalXp(recent) }
   }, [since])
 }
+
+/** The review log and the live cards' review states: what the Profile is built from. Undefined while loading. */
+export function useProfileData() {
+  return useLiveQuery(async () => {
+    const [logs, cards, reviews] = await Promise.all([db.logs.toArray(), db.cards.toArray(), db.reviews.toArray()])
+    const live = new Set(cards.filter((c) => !c.deleted).map((c) => c.id))
+    return { logs, reviews: reviews.filter((r) => live.has(r.cardId)), now: Date.now() }
+  }, [])
+}

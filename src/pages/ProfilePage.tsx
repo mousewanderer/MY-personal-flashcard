@@ -1,14 +1,12 @@
-import { useLiveQuery } from 'dexie-react-hooks'
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon, type IconName } from '../components/Icon'
 import { Modal } from '../components/Modal'
 import { MusicSection } from '../components/MusicSection'
-import { db } from '../db/db'
-import { useProfileSettings } from '../db/hooks'
+import { useProfileData, useProfileSettings } from '../db/hooks'
 import { DEFAULT_PROFILE, saveProfile } from '../db/repo'
 import { buildProfile, type AchievementKind, type DayCount } from '../lib/profile'
 import { nextUnlock } from '../lib/unlocks'
-import { MODES } from '../modes/registry'
+import { LOGGED_MODE_IDS } from '../modes/registry'
 import type { AvatarColor, ProfileSettings } from '../types'
 
 const COLORS: AvatarColor[] = ['blue', 'green', 'purple', 'orange', 'pink', 'teal']
@@ -39,14 +37,10 @@ export default function ProfilePage() {
   const goal = Math.max(1, settings.dailyGoal)
   const [editing, setEditing] = useState(false)
 
-  const data = useLiveQuery(async () => {
-    const [logs, cards, reviews] = await Promise.all([db.logs.toArray(), db.cards.toArray(), db.reviews.toArray()])
-    const live = new Set(cards.filter((c) => !c.deleted).map((c) => c.id))
-    return { logs, reviews: reviews.filter((r) => live.has(r.cardId)), now: Date.now() }
-  }, [])
+  const data = useProfileData()
 
   const p = useMemo(
-    () => data && buildProfile(data.logs, data.reviews, data.now, goal, MODES.filter((m) => m.logged !== false).map((m) => m.id)),
+    () => data && buildProfile(data.logs, data.reviews, data.now, goal, LOGGED_MODE_IDS),
     [data, goal],
   )
 
@@ -175,6 +169,7 @@ function Ring(props: { value: number; max: number; size: number; stroke: number;
             strokeLinecap="round"
             strokeDasharray={c}
             strokeDashoffset={c * (1 - frac)}
+            style={{ '--c': c } as CSSProperties}
             transform={`rotate(-90 ${mid} ${mid})`}
           />
         )}

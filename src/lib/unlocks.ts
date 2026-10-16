@@ -1,3 +1,5 @@
+import type { Unlockable } from './celebrate'
+
 // Unlockable accent colours: each opens at a Profile level, so XP has something to spend on.
 
 export interface Accent {
@@ -30,3 +32,6 @@ export function activeAccent(saved: string | undefined, level: number): string {
 
 /** The next accent to unlock above `level`, if any. */
 export const nextUnlock = (level: number): Accent | null => ACCENTS.find((a) => a.level > level) ?? null
+
+/** Everything a level unlocks, for the level-up celebration. */
+export const UNLOCKABLES: Unlockable[] = ACCENTS.filter((a) => a.level > 1).map((a) => ({ name: a.name, level: a.level, what: 'accent colour' }))

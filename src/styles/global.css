@@ -2716,6 +2716,107 @@ fieldset.field legend {
   font-weight: 700;
 }
 
+/* ---------- Celebrations ---------- */
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+.celebrate {
+  position: fixed;
+  top: calc(12px + var(--sat));
+  left: 50%;
+  z-index: 61;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(92vw, 380px);
+  padding: 12px 16px;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    var(--grad) border-box;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  cursor: pointer;
+  transform: translateX(-50%);
+  animation: celebrate-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes celebrate-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -24px) scale(0.92);
+  }
+}
+.celebrate-badge {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--grad);
+  animation: badge-pop 0.6s 0.15s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+.celebrate-badge.is-achievement,
+.celebrate-badge.is-unlock {
+  background: linear-gradient(135deg, #f5c542, #e08a1e);
+}
+@keyframes badge-pop {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}
+.celebrate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.celebrate-text span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Profile: the XP ring draws itself, progress bars grow, unlocked badges shine once. */
+.ring-fill {
+  animation: ring-draw 0.9s ease-out both;
+}
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: var(--c);
+  }
+}
+.badges .bar span {
+  animation: bar-grow 0.8s ease-out both;
+}
+@keyframes bar-grow {
+  from {
+    width: 0;
+  }
+}
+.badge.is-unlocked .badge-icon {
+  position: relative;
+  overflow: hidden;
+}
+.badge.is-unlocked .badge-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheen 1.2s 0.4s ease both;
+}
+@keyframes sheen {
+  to {
+    transform: translateX(120%);
+  }
+}
+
 /* ---------- Motion ---------- */
 /* Screen changes (router.ts runs them in a view transition). */
 ::view-transition-old(root),

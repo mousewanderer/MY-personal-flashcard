@@ -171,4 +171,7 @@ export const MODES: ModeInfo[] = [
   },
 ]
 
+/** Modes that write to the review log: they count for stats and the Explorer badge. */
+export const LOGGED_MODE_IDS = MODES.filter((m) => m.logged !== false).map((m) => m.id)
+
 export const modeById = (id: string) => MODES.find((m) => m.id === id)

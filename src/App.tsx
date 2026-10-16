@@ -2,6 +2,7 @@ import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core'
 import { useEffect } from 'react'
 import { Icon } from './components/Icon'
 import { MiniPlayer } from './components/MiniPlayer'
+import { Celebrations } from './components/Celebrations'
 import { APP_NAME, APP_TAGLINE } from './config'
 import { useSettings, useXp } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
@@ -136,6 +137,7 @@ export default function App() {
     <>
       <AccentColor saved={accent} />
       {screen}
+      <Celebrations />
     </>
   )
 }
