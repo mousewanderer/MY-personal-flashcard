@@ -3,18 +3,23 @@ import {
   answerWords,
   canHangman,
   canScramble,
+  clearSlot,
+  emptySlots,
   findTile,
   hintStep,
   initialOf,
+  isFull,
   isSolved,
   isUnscrambled,
   keyboardFor,
   maskAnswer,
   nextPending,
   pickWheel,
+  placeTile,
   scrambleChars,
   scrambleTiles,
   takeCyclic,
+  undoSlot,
   wrongCount,
 } from './games'
 
@@ -50,13 +55,26 @@ describe('word scramble', () => {
     expect(findTile(tiles, [], 'a')).toBe(2)
     expect(findTile(tiles, [0, 1], 'n')).toBe(-1)
   })
+  it('places tiles in the first empty slot and sends a tapped slot back', () => {
+    let placed = placeTile(placeTile(emptySlots(3), 2), 0)
+    expect(placed).toEqual([2, 0, null])
+    expect(placeTile(placed, 2)).toBe(placed) // already placed
+    placed = clearSlot(placed, 0)
+    expect(placed).toEqual([null, 0, null])
+    expect(placeTile(placed, 1)).toEqual([1, 0, null]) // fills the gap first
+    expect(undoSlot([1, null, 2])).toEqual([1, null, null])
+    expect(isFull([1, 0, 2])).toBe(true)
+    expect(isFull([1, null, 2])).toBe(false)
+  })
   it('hint keeps the correct prefix and adds the next letter', () => {
     const target = scrambleChars('gato')
     const tiles = ['t', 'o', 'g', 'a']
-    expect(hintStep(tiles, [], target)).toEqual([2])
-    expect(hintStep(tiles, [2, 0], target)).toEqual([2, 3]) // "gt" -> "ga"
+    expect(hintStep(tiles, emptySlots(4), target)).toEqual([2, null, null, null])
+    expect(hintStep(tiles, [2, 0, null, null], target)).toEqual([2, 3, null, null]) // "gt" -> "ga"
+    expect(hintStep(tiles, [2, null, 0, 1], target)).toEqual([2, 3, null, null]) // fills the gap, clears after it
     expect(isUnscrambled(tiles, [2, 3, 0, 1], target)).toBe(true)
     expect(isUnscrambled(tiles, [2, 3, 1, 0], target)).toBe(false)
+    expect(isUnscrambled(tiles, [2, 3, 0, null], target)).toBe(false)
   })
   it('treats repeated letters as interchangeable', () => {
     const target = scrambleChars('papa')

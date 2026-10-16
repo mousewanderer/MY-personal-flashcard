@@ -53,25 +53,50 @@ export function scrambleTiles(answer: string, rng: Rng = Math.random): string[] 
   return tiles
 }
 
+/** One entry per answer slot: the tile index placed there, or null while empty. */
+export type Placed = (number | null)[]
+
+export const emptySlots = (size: number): Placed => Array.from({ length: size }, () => null)
+
+/** Puts the tile in the first empty slot. */
+export function placeTile(placed: Placed, tile: number): Placed {
+  const at = placed.indexOf(null)
+  if (at < 0 || placed.includes(tile)) return placed
+  return placed.map((p, i) => (i === at ? tile : p))
+}
+
+/** Sends the slot's tile back to the tiles. */
+export const clearSlot = (placed: Placed, slot: number): Placed => placed.map((p, i) => (i === slot ? null : p))
+
+/** Clears the last filled slot. */
+export function undoSlot(placed: Placed): Placed {
+  const last = placed.findLastIndex((p) => p !== null)
+  return last < 0 ? placed : clearSlot(placed, last)
+}
+
+export const isFull = (placed: Placed) => placed.length > 0 && !placed.includes(null)
+
 /** Index of an unused tile for a typed key: exact letter first, then ignoring case and accents. */
-export function findTile(tiles: string[], used: number[], key: string): number {
+export function findTile(tiles: string[], used: Placed, key: string): number {
   const free = (i: number) => !used.includes(i)
   const exact = tiles.findIndex((t, i) => free(i) && lower(t) === lower(key))
   return exact >= 0 ? exact : tiles.findIndex((t, i) => free(i) && fold(t) === fold(key))
 }
 
-/** Keeps the correct prefix of `placed` and adds the next correct tile. */
-export function hintStep(tiles: string[], placed: number[], target: string[]): number[] {
+/** Keeps the correct prefix, clears the slots after it, and places the next correct tile. */
+export function hintStep(tiles: string[], placed: Placed, target: string[]): Placed {
   let ok = 0
-  while (ok < placed.length && ok < target.length && lower(tiles[placed[ok]]) === lower(target[ok])) ok++
-  const kept = placed.slice(0, ok)
+  const right = (i: number) => placed[i] != null && lower(tiles[placed[i]!]) === lower(target[i])
+  while (ok < target.length && right(ok)) ok++
+  const kept = target.map((_, i) => (i < ok ? placed[i] : null))
   if (ok >= target.length) return kept
   const next = tiles.findIndex((t, i) => !kept.includes(i) && lower(t) === lower(target[ok]))
-  return next < 0 ? kept : [...kept, next]
+  if (next >= 0) kept[ok] = next
+  return kept
 }
 
-export const isUnscrambled = (tiles: string[], placed: number[], target: string[]) =>
-  placed.length === target.length && placed.every((p, i) => lower(tiles[p]) === lower(target[i]))
+export const isUnscrambled = (tiles: string[], placed: Placed, target: string[]) =>
+  placed.length === target.length && placed.every((p, i) => p !== null && lower(tiles[p]) === lower(target[i]))
 
 // ---------- Hangman ----------
 

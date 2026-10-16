@@ -1067,6 +1067,13 @@ textarea.input {
 .slot.is-filled {
   border-color: var(--accent);
 }
+/* A placed letter is a button: tap it to send it back to the tiles. */
+.slot:is(button) {
+  padding: 0;
+  border-width: 0 0 3px;
+  background: none;
+  cursor: pointer;
+}
 .slot.is-missing {
   color: var(--bad);
   border-color: var(--bad);

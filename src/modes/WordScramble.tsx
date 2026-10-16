@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from 'react'
 import { textSizeClass } from '../lib/format'
-import { answerWords, canScramble, findTile, hintStep, isUnscrambled, scrambleChars, scrambleTiles } from '../lib/games'
+import { canScramble, emptySlots, hintStep, isFull, isUnscrambled, scrambleChars, scrambleTiles, undoSlot, type Placed } from '../lib/games'
 import { useHotkeys } from './hooks'
 import { NotPlayable } from './NotPlayable'
+import { ScrambleBoard } from './ScrambleBoard'
 import { resultFrom, type ModeProps } from './types'
 
 type Status = 'playing' | 'right' | 'skipped'
@@ -11,7 +12,7 @@ export default function WordScramble({ setId, items, onAnswer, onDone }: ModePro
   const playable = useMemo(() => items.filter((it) => canScramble(it.answer)), [items])
   const [index, setIndex] = useState(0)
   const [tiles, setTiles] = useState(() => (playable[0] ? scrambleTiles(playable[0].answer) : []))
-  const [placed, setPlaced] = useState<number[]>([])
+  const [placed, setPlaced] = useState<Placed>(() => emptySlots(playable[0] ? scrambleChars(playable[0].answer).length : 0))
   const [status, setStatus] = useState<Status>('playing')
   const [shake, setShake] = useState(false)
   const [startedAt] = useState(Date.now)
@@ -21,10 +22,10 @@ export default function WordScramble({ setId, items, onAnswer, onDone }: ModePro
   const target = item ? scrambleChars(item.answer) : []
   const playing = !!item && status === 'playing'
 
-  function place(next: number[]) {
-    if (!item) return
+  function change(next: Placed) {
+    if (!playing) return
     setPlaced(next)
-    if (next.length < target.length) return
+    if (!isFull(next)) return
     if (isUnscrambled(tiles, next, target)) {
       setStatus('right')
       void onAnswer(item, true)
@@ -33,9 +34,6 @@ export default function WordScramble({ setId, items, onAnswer, onDone }: ModePro
       window.setTimeout(() => setShake(false), 450)
     }
   }
-
-  const tap = (i: number) => playing && !placed.includes(i) && place([...placed, i])
-  const undo = () => playing && setPlaced(placed.slice(0, -1))
 
   function skip() {
     if (!playing) return
@@ -49,30 +47,20 @@ export default function WordScramble({ setId, items, onAnswer, onDone }: ModePro
       onDone(resultFrom(playable, missed.current, startedAt))
       return
     }
+    const answer = playable[index + 1].answer
     setIndex(index + 1)
-    setTiles(scrambleTiles(playable[index + 1].answer))
-    setPlaced([])
+    setTiles(scrambleTiles(answer))
+    setPlaced(emptySlots(scrambleChars(answer).length))
     setStatus('playing')
   }
 
-  useHotkeys({
-    Backspace: () => undo(),
-    Enter: () => (status !== 'playing' ? next() : false),
-    '*': (e) => {
-      if (!playing) return false
-      const i = findTile(tiles, placed, e.key)
-      if (i < 0) return false
-      tap(i)
-    },
-  })
+  useHotkeys({ Enter: () => (status !== 'playing' ? next() : false) })
 
   if (!item) {
     return <NotPlayable setId={setId} message="None of these answers fit this game (it needs answers of 2 to 24 letters). Try the Back → Front direction." />
   }
 
-  const words = answerWords(item.answer)
-  const slotText = (slot: number) =>
-    status === 'skipped' ? target[slot] : placed[slot] !== undefined ? tiles[placed[slot]] : ''
+  const empty = !placed.some((p) => p !== null)
 
   return (
     <div className="mode">
@@ -84,41 +72,32 @@ export default function WordScramble({ setId, items, onAnswer, onDone }: ModePro
       <div className="prompt-card">
         <span className={textSizeClass(item.prompt)}>{item.prompt}</span>
       </div>
-      <div className={`slots${shake ? ' is-wrong' : ''}${status === 'right' ? ' is-right' : ''}${status === 'skipped' ? ' is-revealed' : ''}`} aria-live="polite">
-        {words.map((slots, w) => (
-          <span key={w} className="slot-word">
-            {slots.map(({ slot }) => (
-              <span key={slot} className={slotText(slot) ? 'slot is-filled' : 'slot'}>
-                {slotText(slot)}
-              </span>
-            ))}
-          </span>
-        ))}
-      </div>
+      <ScrambleBoard
+        answer={item.answer}
+        tiles={tiles}
+        placed={placed}
+        target={target}
+        status={status === 'skipped' ? 'revealed' : status}
+        shake={shake}
+        onChange={change}
+      />
       {status === 'playing' ? (
         <>
-          <div className="letter-tiles">
-            {tiles.map((t, i) => (
-              <button key={i} type="button" className="letter-tile" disabled={placed.includes(i)} onClick={() => tap(i)}>
-                {t}
-              </button>
-            ))}
-          </div>
           <div className="row-center wrap">
-            <button type="button" className="btn" onClick={undo} disabled={!placed.length}>
+            <button type="button" className="btn" onClick={() => change(undoSlot(placed))} disabled={empty}>
               Undo
             </button>
-            <button type="button" className="btn" onClick={() => setPlaced([])} disabled={!placed.length}>
+            <button type="button" className="btn" onClick={() => setPlaced(emptySlots(target.length))} disabled={empty}>
               Clear
             </button>
-            <button type="button" className="btn" onClick={() => place(hintStep(tiles, placed, target))}>
+            <button type="button" className="btn" onClick={() => change(hintStep(tiles, placed, target))}>
               Hint
             </button>
             <button type="button" className="btn" onClick={skip}>
               Skip
             </button>
           </div>
-          <p className="muted small center">Tap the letters in order, or type them. Backspace undoes.</p>
+          <p className="muted small center">Tap the letters in order, or type them. Tap a placed letter to take it back.</p>
         </>
       ) : (
         <div className={`feedback ${status === 'right' ? 'fb-correct' : 'fb-wrong'}`}>
