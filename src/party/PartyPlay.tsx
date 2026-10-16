@@ -5,6 +5,7 @@ import { emptySlots, isFull, isUnscrambled, scrambleChars, type Placed } from '.
 import { PARTY_TARGET, type PartyPlayer, type PartyQuestion, type PartyResult, type Tally } from '../lib/party'
 import { useElapsed } from '../modes/hooks'
 import { ScrambleBoard } from '../modes/ScrambleBoard'
+import { answerFeedback } from '../platform/sfx'
 
 /** Answer time, read when the player answers. */
 const msSince = (start: number) => Date.now() - start
@@ -75,6 +76,7 @@ function PartyQuestionView({ me, game, players, hp, q, result, onAnswer }: Omit<
   function answer(ok: boolean, choice?: number) {
     if (!open) return
     setAnswered({ ok, choice })
+    answerFeedback(ok)
     onAnswer(ok, msSince(start))
   }
 

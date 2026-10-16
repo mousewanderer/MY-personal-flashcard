@@ -6,6 +6,7 @@ import { formatDuration, textSizeClass } from '../lib/format'
 import { canScramble, emptySlots, isFull, isUnscrambled, scrambleChars, scrambleTiles, undoSlot, type Placed } from '../lib/games'
 import type { StudyItem } from '../lib/session'
 import { useElapsed, useHotkeys } from './hooks'
+import { buzz, play } from '../platform/sfx'
 import { ChoiceQuestion } from './questions'
 import { ScrambleBoard } from './ScrambleBoard'
 import { resultFrom, type ModeProps } from './types'
@@ -182,6 +183,8 @@ function Battle({ enemy, setId, items, allCards, onAnswer, onDone }: ModeProps &
     bossRef.current = state
     setBoss(state)
     setFx((f) => ({ n: f.n + 1, kind: ok ? 'hit' : 'attack', damage, mult }))
+    play(ok ? 'hit' : 'hurt')
+    buzz(ok ? 'hit' : 'wrong')
     void onAnswer(item, ok)
   }
 

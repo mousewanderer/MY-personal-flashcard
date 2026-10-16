@@ -71,6 +71,19 @@ export interface Settings {
   accent?: string
   /** Which spaced repetition scheduler rates cards; missing means classic. */
   scheduler?: 'classic' | 'fsrs'
+  /** Unlockable premium theme id (see lib/unlocks); missing means none. */
+  backdrop?: string
+  /** Sound effects; missing means on. */
+  sound?: boolean
+  /** Sound effect volume, 0 to 1; missing means 0.6. */
+  volume?: number
+  /** Vibrate on answers (Android); missing means on. */
+  haptics?: boolean
+  /** Missing follows the system's reduce-motion setting. */
+  motion?: 'full' | 'reduced'
+  textSize?: 'normal' | 'large'
+  /** Show keyboard shortcut hints; missing means on for the web, off on Android. */
+  kbdHints?: boolean
 }
 
 export type AvatarColor = 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'teal'

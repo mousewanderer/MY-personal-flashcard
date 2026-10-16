@@ -17,7 +17,7 @@ import {
 } from '../lib/party'
 import { shuffle } from '../lib/random'
 import type { StudyItem } from '../lib/session'
-import { broadcast, Lan, onLan, sendTo } from '../platform/lan'
+import { broadcast, closeLan, Lan, onLan, sendTo } from '../platform/lan'
 import type { Card, ProfileSettings } from '../types'
 import { PartyEnd, PartyPlay } from './PartyPlay'
 
@@ -76,7 +76,7 @@ function HostGame({ name, items, allCards, onExit }: Props & { name: string }) {
     return () => {
       off()
       broadcast({ t: 'bye' })
-      void Lan.close()
+      closeLan()
     }
   }, [])
 

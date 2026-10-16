@@ -18,9 +18,13 @@ export const lanAvailable = Capacitor.getPlatform() === 'android'
 
 /** Listens to the link's events; returns the cleanup for an effect. */
 export function onLan(onPeer: (id: number, joined: boolean) => void, onMessage: (from: number, data: string) => void): () => void {
+  if (!lanAvailable) return () => {}
   const handles = [Lan.addListener('peer', (e) => onPeer(e.id, e.joined)), Lan.addListener('message', (e) => onMessage(e.from, e.data))]
   return () => handles.forEach((h) => void h.then((x) => x.remove()))
 }
+
+/** Closes the server or the link to the host; nothing to do on the web. */
+export const closeLan = () => void (lanAvailable ? Lan.close().catch(() => {}) : undefined)
 
 export const sendTo = (to: number, msg: object) => void Lan.send({ to, data: JSON.stringify(msg) }).catch(() => {})
 export const broadcast = (msg: object) => void Lan.broadcast({ data: JSON.stringify(msg) }).catch(() => {})

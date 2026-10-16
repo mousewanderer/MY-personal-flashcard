@@ -2716,6 +2716,84 @@ fieldset.field legend {
   font-weight: 700;
 }
 
+/* ---------- Motion ---------- */
+/* Screen changes (router.ts runs them in a view transition). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.18s;
+  animation-timing-function: ease;
+}
+::view-transition-old(root) {
+  animation-name: screen-out;
+}
+::view-transition-new(root) {
+  animation-name: screen-in;
+}
+@keyframes screen-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+/* Buttons press in; answers pop when right and shake when wrong; new questions rise in. */
+.btn,
+.choice,
+.icon-btn,
+.letter-tile,
+.enemy-card,
+.key {
+  transition:
+    transform 0.12s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    filter 0.15s ease;
+}
+.btn:active:not(:disabled),
+.choice:active:not([aria-disabled='true']),
+.icon-btn:active,
+.letter-tile:active:not(:disabled),
+.enemy-card:active:not(:disabled),
+.key:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.choice.is-right {
+  animation: answer-pop 0.35s ease;
+}
+.choice.is-wrong {
+  animation: shake 0.4s;
+}
+@keyframes answer-pop {
+  40% {
+    transform: scale(1.04);
+  }
+}
+.prompt-card,
+.flip {
+  animation: rise-in 0.25s ease both;
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.bar:not(.timebar) span {
+  transition: width 0.35s ease;
+}
+/* Reduce motion (Settings, or the system's choice): nothing moves. */
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] *::before,
+:root[data-motion='reduced'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .boss-sprite.is-hit,
   .boss-sprite.is-attack,

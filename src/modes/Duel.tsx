@@ -21,6 +21,7 @@ import { emptySlots, isFull, isUnscrambled, scrambleChars, scrambleTiles, type P
 import { shuffle } from '../lib/random'
 import type { StudyItem } from '../lib/session'
 import { PartyHost } from '../party/PartyHost'
+import { play } from '../platform/sfx'
 import { lanAvailable } from '../platform/lan'
 import { navigate } from '../router'
 import { HeroSprite } from './Boss'
@@ -142,7 +143,16 @@ function LocalDuel({ setId, items, allCards, game, onChangeGame }: ModeProps & {
   }, [outcome, state, scramble, order, q])
 
   const pick = (player: number, choice: number) => {
-    if (winner === null) dispatch({ type: 'pick', player, choice, correct, damage })
+    if (winner !== null || outcome !== null || state.q.locked[player]) return
+    dispatch({ type: 'pick', player, choice, correct, damage })
+    if (choice === correct) play(battle ? 'hit' : 'right')
+    else play('wrong')
+  }
+
+  function solve(player: number) {
+    if (winner !== null || outcome !== null) return
+    dispatch({ type: 'solve', player, damage })
+    play(battle ? 'hit' : 'right')
   }
 
   const keyMap: Record<string, () => void> = {}
@@ -228,7 +238,7 @@ function LocalDuel({ setId, items, allCards, game, onChangeGame }: ModeProps & {
             item={item}
             tiles={tiles}
             result={outcome === null ? null : outcome === p ? 'right' : 'revealed'}
-            onSolve={() => winner === null && dispatch({ type: 'solve', player: p, damage })}
+            onSolve={() => solve(p)}
           />
         ) : (
           <div className="duel-options">

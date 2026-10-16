@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FocusButton } from '../components/FocusButton'
 import { Icon } from '../components/Icon'
 import { useConfirm } from '../components/useConfirm'
@@ -12,6 +12,7 @@ import { useHotkeys } from '../modes/hooks'
 import { modeById } from '../modes/registry'
 import type { SessionResult } from '../modes/types'
 import { setBackHandler } from '../platform/backButton'
+import { answerFeedback } from '../platform/sfx'
 import { navigate } from '../router'
 import type { Card, Direction, Rating, ReviewState } from '../types'
 
@@ -94,9 +95,12 @@ export default function StudyPage({ setId, tag, modeId, direction, shuffle, star
     }
   }, [setId, all, tag, starredOnly, begin])
 
+  const streak = useRef(0)
   const onAnswer = useCallback(
     async (item: StudyItem, correct: boolean, rating?: Rating) => {
       setAnswered((n) => n + 1)
+      streak.current = correct ? streak.current + 1 : 0
+      answerFeedback(correct, streak.current)
       const next = await recordAnswer({ card: item.card, mode: modeId, correct, rating, practiceAhead: run?.practiceAhead })
       if (next) setReviews((m) => new Map(m).set(next.cardId, next))
       return next

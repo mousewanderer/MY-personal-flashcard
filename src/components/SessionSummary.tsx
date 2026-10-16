@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { useXp } from '../db/hooks'
 import { formatDuration } from '../lib/format'
 import { levelFromXp } from '../lib/profile'
 import type { SessionResult } from '../modes/types'
+import { play } from '../platform/sfx'
 import { Icon } from './Icon'
 
 interface Props {
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export function SessionSummary({ result, since, onRetryMissed, onRestart, onExit, exitLabel = 'Back to set' }: Props) {
+  useEffect(() => play('complete'), [])
   return (
     <div className="mode summary">
       <h2>Session complete</h2>

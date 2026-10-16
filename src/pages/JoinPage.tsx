@@ -3,7 +3,7 @@ import { getValue, setValue } from '../db/repo'
 import { DUEL_GAMES, type DuelGame } from '../lib/duel'
 import { helloMsg, parseHostMsg, type PartyPlayer, type PartyQuestion, type PartyResult, type Tally } from '../lib/party'
 import { PartyEnd, PartyPlay } from '../party/PartyPlay'
-import { cleanAddress, Lan, lanAvailable, onLan, sendTo } from '../platform/lan'
+import { cleanAddress, closeLan, Lan, lanAvailable, onLan, sendTo } from '../platform/lan'
 import { navigate } from '../router'
 import type { ProfileSettings } from '../types'
 
@@ -36,7 +36,7 @@ export default function JoinPage() {
       setError(message)
       setStage('form')
       setG(null)
-      void Lan.close()
+      closeLan()
     }
     const off = onLan(
       (id, joined) => {
@@ -55,7 +55,7 @@ export default function JoinPage() {
     )
     return () => {
       off()
-      void Lan.close()
+      closeLan()
     }
   }, [])
 
@@ -76,7 +76,7 @@ export default function JoinPage() {
   }
 
   function leave() {
-    void Lan.close()
+    closeLan()
     setG(null)
     setStage('form')
   }

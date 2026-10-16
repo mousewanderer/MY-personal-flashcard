@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { textSizeClass } from '../lib/format'
 import { previewWith } from '../lib/fsrs'
 import { RATINGS, formatInterval, initialReview } from '../lib/scheduler'
+import { play } from '../platform/sfx'
 import type { Rating } from '../types'
 import { useHotkeys } from './hooks'
 import { resultFrom, type ModeProps } from './types'
@@ -22,6 +23,11 @@ export default function Flashcards({ items, reviews, settings, practiceAhead, on
       ? previewWith(settings.scheduler, reviews.get(item.card.id) ?? initialReview(item.card.id), startedAt)
       : null
 
+  function flip(to: boolean) {
+    if (to !== flipped) play('flip')
+    setFlipped(to)
+  }
+
   async function rate(rating: Rating) {
     if (!item || !flipped || busy.current) return
     busy.current = true
@@ -41,7 +47,7 @@ export default function Flashcards({ items, reviews, settings, practiceAhead, on
   }
 
   useHotkeys({
-    ' ': () => setFlipped((f) => !f),
+    ' ': () => flip(!flipped),
     '1': () => void rate('again'),
     '2': () => void rate('hard'),
     '3': () => void rate('good'),
@@ -61,7 +67,7 @@ export default function Flashcards({ items, reviews, settings, practiceAhead, on
         key={item.key}
         type="button"
         className={flipped ? 'flip is-flipped' : 'flip'}
-        onClick={() => setFlipped((f) => !f)}
+        onClick={() => flip(!flipped)}
         aria-label={flipped ? 'Show front' : 'Show answer'}
       >
         <span className="flip-inner">
@@ -83,7 +89,7 @@ export default function Flashcards({ items, reviews, settings, practiceAhead, on
           ))}
         </div>
       ) : (
-        <button type="button" className="btn btn-primary btn-block" onClick={() => setFlipped(true)}>
+        <button type="button" className="btn btn-primary btn-block" onClick={() => flip(true)}>
           Show answer <kbd>Space</kbd>
         </button>
       )}

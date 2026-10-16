@@ -18,7 +18,8 @@ import SetPage from './pages/SetPage'
 import JoinPage from './pages/JoinPage'
 import SettingsPage from './pages/SettingsPage'
 import StudyPage from './pages/StudyPage'
-import { useRoute } from './router'
+import { initSfx, setFeedbackPrefs } from './platform/sfx'
+import { setRouteMotion, useRoute } from './router'
 import type { Direction } from './types'
 
 const DIRECTIONS: Direction[] = ['front-back', 'back-front', 'mixed']
@@ -35,10 +36,12 @@ function AccentColor({ saved }: { saved: string | undefined }) {
 }
 
 export default function App() {
-  const { theme, accent } = useSettings()
+  const settings = useSettings()
+  const { theme, accent } = settings
   const { parts, query } = useRoute()
 
   useEffect(() => {
+    initSfx()
     void ensureFirstRun()
     void initMusic()
     void initFocus()
@@ -54,6 +57,23 @@ export default function App() {
       void SystemBars.setStyle({ style })
     }
   }, [theme])
+
+  useEffect(() => {
+    setFeedbackPrefs({ sound: settings.sound ?? true, volume: settings.volume ?? 0.6, haptics: settings.haptics ?? true })
+  }, [settings.sound, settings.volume, settings.haptics])
+
+  // Reduced motion: the setting, or else the system's choice.
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => {
+      const reduced = settings.motion === 'reduced' || (settings.motion !== 'full' && media.matches)
+      document.documentElement.dataset.motion = reduced ? 'reduced' : 'full'
+      setRouteMotion(!reduced)
+    }
+    apply()
+    media.addEventListener('change', apply)
+    return () => media.removeEventListener('change', apply)
+  }, [settings.motion])
 
   const [section, a, b] = parts
   const tab = section === 'doc' ? 'docs' : ['docs', 'profile', 'settings'].includes(section) ? section : 'sets'
