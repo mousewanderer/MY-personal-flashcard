@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { looksScanned, pagesToText, pageToText, titleFromFileName, wordCount } from './pdfText'
+import { looksScanned, needsOcr, ocrToItems, pagesToText, pageToText, titleFromFileName, wordCount } from './pdfText'
 
 describe('pageToText', () => {
   it('joins items and breaks lines where pdf.js marks an end of line', () => {
@@ -47,8 +47,22 @@ describe('wordCount and titleFromFileName', () => {
     expect(wordCount('')).toBe(0)
   })
 
-  it('drops the .pdf extension', () => {
+  it('drops the .pdf or image extension', () => {
     expect(titleFromFileName('Lecture 3 - Cells.PDF')).toBe('Lecture 3 - Cells')
+    expect(titleFromFileName('notes page 2.jpeg')).toBe('notes page 2')
     expect(titleFromFileName('.pdf')).toBe('Untitled')
+  })
+})
+
+describe('OCR', () => {
+  it('scans pages with almost no text layer', () => {
+    expect(needsOcr([])).toBe(true)
+    expect(needsOcr([{ str: '12', hasEOL: true }])).toBe(true)
+    expect(needsOcr([{ str: 'Photosynthesis turns light into sugar.' }])).toBe(false)
+  })
+
+  it('turns OCR lines into items and rejoins words split at a line end', () => {
+    const items = ocrToItems('The mito-\nchondria makes\n\nATP. Self-\nTest')
+    expect(pageToText(items)).toBe('The mitochondria makes\n\nATP. Self-\nTest')
   })
 })

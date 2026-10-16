@@ -1,38 +1,52 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { db } from '../db/db'
-import { addDoc } from '../db/repo'
-import { extractPdfText, PdfError } from '../lib/pdf'
+import { addDoc, getValue, setValue } from '../db/repo'
+import { OCR_LANGS } from '../lib/ocr'
+import { extractImageText, extractPdfText, PdfError } from '../lib/pdf'
 import { looksScanned, titleFromFileName } from '../lib/pdfText'
 import { navigate } from '../router'
 
-type Status = { kind: 'idle' } | { kind: 'reading'; page: number; total: number; name: string } | { kind: 'error'; message: string }
+type Status =
+  | { kind: 'idle' }
+  | { kind: 'reading'; page: number; total: number; name: string; scanning: boolean }
+  | { kind: 'error'; message: string }
+
+const isImage = (file: File) => file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name)
 
 export default function DocsPage() {
   const docs = useLiveQuery(() => db.docs.orderBy('createdAt').reverse().toArray(), [])
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
+  const [ocrLang, setOcrLang] = useState('eng')
   const input = useRef<HTMLInputElement>(null)
 
-  async function importPdf(file: File) {
-    setStatus({ kind: 'reading', page: 0, total: 0, name: file.name })
+  useEffect(() => {
+    void getValue<string>('ocrLang').then((lang) => lang && setOcrLang(lang))
+  }, [])
+
+  function pickLang(lang: string) {
+    setOcrLang(lang)
+    void setValue('ocrLang', lang)
+  }
+
+  async function importFile(file: File) {
+    const image = isImage(file)
+    setStatus({ kind: 'reading', page: 0, total: 0, name: file.name, scanning: image })
     try {
-      const { text, pages } = await extractPdfText(file, (page, total) =>
-        setStatus({ kind: 'reading', page, total, name: file.name }),
-      )
+      const { text, pages } = image
+        ? await extractImageText(file, ocrLang)
+        : await extractPdfText(file, (page, total, scanning) => setStatus({ kind: 'reading', page, total, name: file.name, scanning }), ocrLang)
       if (looksScanned(text, pages)) {
-        setStatus({
-          kind: 'error',
-          message: "No text found. This PDF looks scanned (images of pages), which isn't supported.",
-        })
+        setStatus({ kind: 'error', message: 'No text found, even after scanning. Try a sharper scan or another scan language.' })
         return
       }
       const id = await addDoc({ title: titleFromFileName(file.name), fileName: file.name, text, pages })
       setStatus({ kind: 'idle' })
       navigate(`/doc/${id}`)
     } catch (e) {
-      setStatus({ kind: 'error', message: e instanceof PdfError ? e.message : "Something went wrong reading this PDF." })
+      setStatus({ kind: 'error', message: e instanceof PdfError ? e.message : 'Something went wrong reading this file.' })
     }
   }
 
@@ -45,25 +59,35 @@ export default function DocsPage() {
       <div className="page-head">
         <h1>Docs</h1>
         <button type="button" className="btn btn-primary" disabled={busy} onClick={() => input.current?.click()}>
-          <Icon name="import" /> Import PDF
+          <Icon name="import" /> Import PDF or photo
         </button>
         <input
           ref={input}
           type="file"
-          accept=".pdf,application/pdf"
+          accept=".pdf,application/pdf,image/png,image/jpeg,image/webp"
           hidden
           onChange={(e) => {
             const file = e.target.files?.[0]
             e.target.value = ''
-            if (file) void importPdf(file)
+            if (file) void importFile(file)
           }}
         />
       </div>
+      <label className="row wrap small muted">
+        Scan language for photos and scanned pages
+        <select value={ocrLang} onChange={(e) => pickLang(e.target.value)} disabled={busy}>
+          {OCR_LANGS.map((l) => (
+            <option key={l.code} value={l.code}>
+              {l.name}
+            </option>
+          ))}
+        </select>
+      </label>
 
       {status.kind === 'reading' && (
         <div className="panel" role="status">
           <p className="doc-status">
-            Reading {status.name}
+            {status.scanning ? 'Scanning' : 'Reading'} {status.name}
             {status.total > 0 && ` · page ${status.page} of ${status.total}`}…
           </p>
           <div className="bar">

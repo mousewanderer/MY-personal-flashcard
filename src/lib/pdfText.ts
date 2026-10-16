@@ -35,8 +35,19 @@ export const wordCount = (text: string): number => text.match(/\S+/g)?.length ??
 export const looksScanned = (text: string, pages: number): boolean =>
   text.replace(/\s/g, '').length < Math.max(1, pages) * 5
 
+/** A page with almost no text layer (a scan, or just a page number) goes through OCR. */
+export const needsOcr = (items: PdfTextItem[]): boolean => pageToText(items).replace(/\s/g, '').length < 20
+
+/** OCR text as text items, one per line, with words split across a line end ("exam-" "ple") joined. */
+export function ocrToItems(text: string): PdfTextItem[] {
+  return text
+    .replace(/(\p{L})-\r?\n(\p{Ll})/gu, '$1$2')
+    .split(/\r?\n/)
+    .map((str) => ({ str, hasEOL: true }))
+}
+
 export function titleFromFileName(fileName: string): string {
-  return fileName.replace(/\.pdf$/i, '').trim() || 'Untitled'
+  return fileName.replace(/\.(pdf|png|jpe?g|webp)$/i, '').trim() || 'Untitled'
 }
 
 export const txtFileName = (title: string): string => `${title.replace(/[\\/:*?"<>|]/g, '_').trim() || 'document'}.txt`
