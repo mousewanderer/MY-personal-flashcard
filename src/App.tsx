@@ -2,7 +2,7 @@ import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core'
 import { useEffect } from 'react'
 import { Icon } from './components/Icon'
 import { MiniPlayer } from './components/MiniPlayer'
-import { APP_NAME } from './config'
+import { APP_NAME, APP_TAGLINE } from './config'
 import { useSettings, useXp } from './db/hooks'
 import { ensureFirstRun } from './db/repo'
 import { initFocus } from './focus/timer'
@@ -85,7 +85,10 @@ export default function App() {
     screen = (
       <div className="app">
         <nav className="nav" aria-label="Main">
-          <span className="brand">{APP_NAME}</span>
+          <span className="brand">
+            {APP_NAME}
+            <small>{APP_TAGLINE}</small>
+          </span>
           <a className={tab === 'sets' ? 'nav-link is-active' : 'nav-link'} href="#/">
             <Icon name="sets" />
             <span>Sets</span>

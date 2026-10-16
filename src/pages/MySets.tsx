@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { FocusButton } from '../components/FocusButton'
+import { APP_TAGLINE } from '../config'
 import { Icon } from '../components/Icon'
 import { ImportDialog } from '../components/ImportDialog'
 import { Modal } from '../components/Modal'
@@ -105,6 +106,7 @@ export default function MySets() {
           </button>
         </div>
       </div>
+      <p className="muted tagline">{APP_TAGLINE}</p>
 
       {rows && rows.length > 0 && (
         <div className="today-row">

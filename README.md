@@ -1,4 +1,6 @@
-# Flashcards
+# Knowetility
+
+Everything you study, in one box.
 
 A personal, offline flashcard app: sets and cards, spaced repetition, study modes and games, and CSV import/export. Everything is stored on your device (IndexedDB). There are no accounts and no server. It runs in the browser on a laptop and as an Android app.
 

@@ -1,4 +1,4 @@
-# Opens Flashcards as a desktop window. Serves the production build on http://localhost:5173,
+# Opens Knowetility as a desktop window. Serves the production build on http://localhost:5173,
 # the same origin as `npm run dev`, so both share the same IndexedDB data in Edge.
 # The desktop shortcut runs this. It rebuilds first when the source has changed since the last build.
 #   launch.ps1           open the app
@@ -17,7 +17,7 @@ function Get-Server {
 if ($Stop) { Get-Server | ForEach-Object { Stop-Process -Id $_.ProcessId }; return }
 
 if ($Install) {
-  $lnk = (New-Object -ComObject WScript.Shell).CreateShortcut("$([Environment]::GetFolderPath('Desktop'))\Flashcards.lnk")
+  $lnk = (New-Object -ComObject WScript.Shell).CreateShortcut("$([Environment]::GetFolderPath('Desktop'))\Knowetility.lnk")
   $lnk.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
   $lnk.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`""
   $lnk.WorkingDirectory = $root
@@ -44,7 +44,7 @@ try {
     if ($LASTEXITCODE -ne 0) {
       $msg = "The build failed, so this opens the last version that built.`nDetails: $env:TEMP\flashcards-build.log"
       if (-not (Test-Path dist/index.html)) { $msg = "The build failed and there is no earlier build to open.`nDetails: $env:TEMP\flashcards-build.log" }
-      [void](New-Object -ComObject WScript.Shell).Popup($msg, 0, 'Flashcards', 48)
+      [void](New-Object -ComObject WScript.Shell).Popup($msg, 0, 'Knowetility', 48)
       if (-not (Test-Path dist/index.html)) { return }
     }
   }

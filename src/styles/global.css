@@ -1,14 +1,17 @@
 :root {
-  --bg: #f4f5f7;
+  --bg: #f2f6fb;
   --surface: #ffffff;
-  --surface-2: #eceff3;
-  --text: #1b1f24;
-  --muted: #5d6873;
-  --border: #d8dde3;
-  --accent: #1f5f99;
-  --accent-hover: #184d7d;
+  --surface-2: #e9f0f8;
+  --text: #0f1b2d;
+  --muted: #55657a;
+  --border: #d4dfec;
+  --accent: #1f6fd1;
+  --accent-hover: #195cb0;
   --accent-text: #ffffff;
-  --accent-soft: #e2edf8;
+  --accent-soft: #e1edfb;
+  /* Brand: study blue blending into green. Unlockable accents recolour the blue end. */
+  --accent-2: #12805a;
+  --grad: linear-gradient(135deg, var(--accent), var(--accent-2));
   --ok: #1d7544;
   --ok-soft: #e0f2e7;
   --bad: #b3261e;
@@ -28,18 +31,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #111316;
-    --surface: #1a1d21;
-    --surface-2: #24282d;
-    --text: #e7e9ec;
-    --muted: #9aa4ae;
-    --border: #30353c;
-    --accent: #6ea9de;
-    --accent-hover: #8bbbe8;
-    --accent-text: #0c1a27;
-    --accent-soft: #1c3145;
-    --ok: #5ec98c;
-    --ok-soft: #163626;
+    --bg: #0a1120;
+    --surface: #111a2e;
+    --surface-2: #17223a;
+    --text: #e6edf7;
+    --muted: #8fa1bd;
+    --border: #23314d;
+    --accent: #4f9df5;
+    --accent-hover: #74b3f8;
+    --accent-text: #06121f;
+    --accent-soft: #13284a;
+    --ok: #34d399;
+    --ok-soft: #0f3326;
+    --accent-2: #34d399;
     --bad: #f0877d;
     --bad-soft: #3c1c1a;
     --warn: #e2b25a;
@@ -49,18 +53,19 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #111316;
-  --surface: #1a1d21;
-  --surface-2: #24282d;
-  --text: #e7e9ec;
-  --muted: #9aa4ae;
-  --border: #30353c;
-  --accent: #6ea9de;
-  --accent-hover: #8bbbe8;
-  --accent-text: #0c1a27;
-  --accent-soft: #1c3145;
-  --ok: #5ec98c;
-  --ok-soft: #163626;
+  --bg: #0a1120;
+  --surface: #111a2e;
+  --surface-2: #17223a;
+  --text: #e6edf7;
+  --muted: #8fa1bd;
+  --border: #23314d;
+  --accent: #4f9df5;
+  --accent-hover: #74b3f8;
+  --accent-text: #06121f;
+  --accent-soft: #13284a;
+  --ok: #34d399;
+  --ok-soft: #0f3326;
+  --accent-2: #34d399;
   --bad: #f0877d;
   --bad-soft: #3c1c1a;
   --warn: #e2b25a;
@@ -224,9 +229,25 @@ kbd {
   }
   .brand {
     display: block;
-    font-weight: 700;
-    font-size: 1.15rem;
+    font-weight: 800;
+    font-size: 1.25rem;
     padding: 0 12px 16px;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand small {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+    -webkit-text-fill-color: var(--muted);
+  }
+  /* The nav shows the tagline on wide screens. */
+  .tagline {
+    display: none;
   }
   .nav-link {
     flex: none;
@@ -334,12 +355,12 @@ kbd {
   cursor: default;
 }
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--grad);
+  border-color: transparent;
   color: var(--accent-text);
 }
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
+  filter: brightness(1.08);
 }
 .btn-danger {
   background: var(--bad);
@@ -627,7 +648,7 @@ textarea.input {
 .bar span {
   display: block;
   height: 100%;
-  background: var(--ok);
+  background: var(--grad);
 }
 .set-tile-actions {
   display: flex;
@@ -1038,7 +1059,7 @@ textarea.input {
   color: var(--bad);
 }
 .timebar span {
-  background: var(--accent);
+  background: var(--grad);
   transition: width 0.25s linear;
 }
 
@@ -2582,6 +2603,10 @@ fieldset.field legend {
   .duel-key {
     display: inline-flex;
   }
+}
+
+.tagline {
+  margin: -6px 0 14px;
 }
 
 /* ---------- Hotspot games ---------- */

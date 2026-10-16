@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.melyap.flashcards',
-  appName: 'Flashcards',
+  appName: 'Knowetility',
   webDir: 'dist',
   plugins: {
     SystemBars: {
